@@ -17,7 +17,7 @@ export default function Home() {
               className="w-[32px] h-[32px] rounded-[8px] bg-white bg-center bg-no-repeat bg-contain"
               style={{ backgroundImage: "url('/logo.png')" }}
             ></div>
-            <h1 className="text-white text-lg ml-3 font-[Montserrat] font-bold">RPL FINAL</h1>            
+            <h1 className="text-white text-lg ml-3 font-bold">RPL FINAL</h1>            
           </div>
           
           <div className="relative item-center justify-center mt-[40px] ml-[70px] w-[456px] h-[183px]">

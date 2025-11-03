@@ -15,26 +15,26 @@ export default function LoginPage() {
             className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
             style={{ backgroundImage: "url('/logo.png')" }}
           ></div>
-          <h1 className="text-black text-lg ml-3 font-[Montserrat] font-bold">
+          <h1 className="text-black text-lg ml-3 font-bold">
             RPL FINAL
           </h1>
         </div>
         
         <div className="w-[378px] h-[350px] rounded-2xl mx-auto">
-            <h1 className="text-4xl font-[Montserrat] font-bold">Log In</h1>
+            <h1 className="text-4xl font-bold">Log In</h1>
             <div className="bg-[white] w-[378px] h-[196px] mt-[20px]">
                 <div className="flex flex-col">
-                    <label htmlFor="email" className="font-[Monstserrat]">Email</label>
+                    <label htmlFor="email">Email</label>
                     <input type="email" id="email" className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300"/>
-                    <label htmlFor="password" className="font-[Monstserrat] mt-[15px]">Password</label>
+                    <label htmlFor="password" className="mt-[15px]">Password</label>
                     <input type="password" id="password" className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300"/>
-                    <Link href="/auth/forgot" className="font-[Monstserrat] text-blue-500 mt-[10px]">
+                    <Link href="/auth/forgot" className="text-blue-500 mt-[10px]">
                         Lupa Password?
                     </Link>
                 </div>
 
-                <div className="flex justify-end mr-[10px] mt-[10px]">
-                    <button className="bg-blue-400 font-[Monsterrat] font-bold text-white rounded-md w-[77px] h-[40px]">
+                <div className="flex justify-end mt-[10px]">
+                    <button className="bg-blue-400 font-bold text-white rounded-md w-[77px] h-[40px]">
                         Masuk
                     </button>                    
                 </div>
