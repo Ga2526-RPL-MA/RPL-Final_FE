@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("MAHASISWA");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,9 +21,10 @@ export default function RegisterPage() {
       setError("Password dan konfirmasi password tidak sama!");
       return;
     }
+    setSuccess("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/register`, {
+      const res = await fetch(`/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -40,8 +42,10 @@ export default function RegisterPage() {
         throw new Error(data.message || "Registrasi gagal");
       }
 
-      alert("Registrasi berhasil! Silakan login.");
-      router.push("/auth/login");
+      setSuccess("Registrasi berhasil! Silakan login.");
+      setTimeout(() => {
+        router.push("/auth/login");
+      }, 2000); // Redirect after 2 seconds
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -138,6 +142,7 @@ export default function RegisterPage() {
           />
 
           {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+          {success && <p className="text-green-500 text-sm mt-3">{success}</p>}
 
           <div className="flex justify-end mt-[20px]">
             <button

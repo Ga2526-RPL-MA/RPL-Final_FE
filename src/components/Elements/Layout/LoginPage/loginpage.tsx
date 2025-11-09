@@ -14,7 +14,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/login`, {
+      const res = await fetch(`/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -28,8 +28,25 @@ export default function LoginPage() {
 
       //save token *local storage
       localStorage.setItem("access_token", data.access_token);
+
+      // Fetch user data to get the role
+      const meRes = await fetch(`/api/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${data.access_token}`,
+        },
+      });
+
+      if (!meRes.ok) {
+        throw new Error("Gagal mengambil data pengguna");
+      }
+
+      const meData = await meRes.json();
       
-      router.push("/dashboard");
+      if (meData.role === "MAHASISWA") {
+        router.push("/mahasiswa/dashboard");
+      } else {
+        router.push("/"); 
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
