@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
 import "./globals.css";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  variable: "--font-montserrat", // ini penting biar bisa dipakai di Tailwind
-});
 
 export const metadata: Metadata = {
   title: "RPL_Final Project",
@@ -20,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} font-montserrat antialiased`}>
+      <body className="font-sans antialiased">
         {children}
       </body>
     </html>

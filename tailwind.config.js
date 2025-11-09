@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        montserrat: ["var(--font-montserrat)", "Montserrat", "sans-serif"],
+        sans: ['"Segoe UI"', "sans-serif"],
       },
     },
   },
