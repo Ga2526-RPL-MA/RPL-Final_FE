@@ -31,6 +31,7 @@ export default function LoginPage() {
 
       // Fetch user data to get the role
       const meRes = await fetch(`/api/auth/me`, {
+        method: "GET",
         headers: {
           Authorization: `Bearer ${data.access_token}`,
         },
@@ -42,7 +43,7 @@ export default function LoginPage() {
 
       const meData = await meRes.json();
       
-      if (meData.role === "MAHASISWA") {
+      if (meData.profile?.role === "MAHASISWA") {
         router.push("/mahasiswa/dashboard");
       } else {
         router.push("/"); 
