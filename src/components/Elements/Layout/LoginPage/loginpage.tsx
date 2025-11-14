@@ -30,8 +30,7 @@ export default function LoginPage() {
       localStorage.setItem("access_token", data.access_token);
 
       // Fetch user data to get the role
-      const meRes = await fetch(`/api/auth/me`, {
-        method: "GET",
+      const meRes = await fetch(`/api/auth/me`, {        
         headers: {
           Authorization: `Bearer ${data.access_token}`,
         },
