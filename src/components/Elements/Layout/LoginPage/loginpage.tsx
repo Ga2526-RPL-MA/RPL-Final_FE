@@ -44,9 +44,12 @@ export default function LoginPage() {
       
       if (meData.profile?.role === "MAHASISWA") {
         router.push("/mahasiswa/dashboard");
+      } else if (meData.profile?.role === "DOSEN") {
+        router.push("/dosen/dashboard");
       } else {
-        router.push("/"); 
+        router.push("/");
       }
+
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
