@@ -62,7 +62,7 @@ export default function ProgressTugasAkhir() {
             </div>
             </Link>
 
-            <Link href="/mahasiswa/dashboard/panduan">
+            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
             {/* Menu 4 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-file-earmark text-xl"></i>

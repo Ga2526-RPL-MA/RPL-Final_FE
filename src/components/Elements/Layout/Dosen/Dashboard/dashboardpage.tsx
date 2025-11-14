@@ -37,36 +37,46 @@ export default function DosenDashboardPage() {
         <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
           {/* Main Sidebar */}
           <div className="w-full h-[225px] mt-[30px] flex flex-col">
-
+            
+            <Link href="/dosen/dashboard">
             {/* Menu 1 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-house-door text-xl"></i>
               <h1 className="font-medium">Beranda</h1>
             </div>
+            </Link>
 
+            <Link href="/dosen/dashboard/tawaranjudul">
             {/* Menu 2 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-people-fill text-xl"></i>
               <h1 className="font-medium">Tawaran Judul</h1>
             </div>
+            </Link>
 
+            <Link href="/dosen/dashboard/formpengajuanjudul">
             {/* Menu 3 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-book text-xl"></i>
-              <h1 className="font-medium">Progress Tugas Akhir</h1>
+              <h1 className="font-medium">Form Pengajuan Judul</h1>
             </div>
+            </Link>
 
+            <Link href="/dosen/dashboard/monitoring">
             {/* Menu 4 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-display text-xl"></i>
               <h1 className="font-medium">Monitoring</h1>
             </div>
+            </Link>
 
+            <Link href="/dosen/dashboard/panduandosen">
             {/* Menu 5 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-file-earmark text-xl"></i>
               <h1 className="font-medium">Panduan</h1>
             </div>
+            </Link>
 
           </div>
           {/* Sub Sidebar */}

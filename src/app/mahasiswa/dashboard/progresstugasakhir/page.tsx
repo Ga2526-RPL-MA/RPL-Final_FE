@@ -1,4 +1,4 @@
-import ProgressTugasAkhir from "@/components/Elements/Layout/Mahasiswa/Dashboard/Progress Tugas Akhir/progresstugasakhir";
+import ProgressTugasAkhir from "@/components/Elements/Layout/Mahasiswa/Progress Tugas Akhir/progresstugasakhir";
 
 export default function ProgressTugasAkhirPage() {
     return (
