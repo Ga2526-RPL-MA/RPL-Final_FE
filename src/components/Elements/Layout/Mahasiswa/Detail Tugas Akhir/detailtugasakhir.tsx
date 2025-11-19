@@ -6,7 +6,7 @@ import {
 
 import Link from "next/link";
 
-export default function Panduan() {
+export default function DetailTugasAkhir() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Header */}
@@ -99,7 +99,93 @@ export default function Panduan() {
           <div className="flex justify-start w-full text-gray-400 gap-2">
             <span>BERANDA</span>
             <span>\</span>
-            <span>PANDUAN</span>
+            <span>TAWARAN JUDUL TUGAS AKHIR</span>
+            <span>\</span>
+            <span>DETAIL TUGAS AKHIR</span>
+          </div>
+
+          <div className="w-full flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-black">
+              Detail Tugas Akhir
+            </h1>
+          </div>
+
+          <div className="w-full bg-white border border-gray-300 rounded-xl p-6">
+
+            {/* Judul + Status */}
+            <div className="border border-dotted border-gray-400 p-4 rounded-lg">
+              <div className="flex justify-between items-start">
+                <h1 className="text-2xl font-semibold text-black">
+                  Analisis Sistem Go Go Card pada <span className="italic">Game</span> Magic Chess Go Go
+                </h1>
+
+                {/* Published */}
+                <span className="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">
+                  Published
+                </span>
+              </div>
+
+              {/* tanggal & author */}
+              <p className="text-sm text-gray-500 mt-2">
+                Dibuat pada: 08 November 2025
+              </p>
+              <p className="text-sm text-gray-500">
+                Dibuat oleh: Ir. John Doe S.Kom, M.Kom.
+              </p>
+            </div>
+
+            {/* Garis */}
+            <div className="w-full h-[1px] bg-gray-400 my-4"></div>
+
+            {/* Informasi */}
+            <h1 className="text-2xl font-semibold text-black mb-2">Informasi</h1>
+
+            {/* Box Informasi */}
+            <div className="border border-dotted border-gray-400 p-4 rounded-lg">
+              {/* Judul */}
+              <div className="mb-3">
+                <p className="text-sm text-gray-500">Judul</p>
+                <p className="text-black">
+                  Analisis Sistem Go Go Card pada Game Magic Chess Go Go
+                </p>
+              </div>
+
+              {/* Deskripsi */}
+              <div className="mb-3">
+                <p className="text-sm text-gray-500">Deskripsi</p>
+                <p className="text-black text-justify">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
+                  sodales bibendum arcu, at molestie elit laoreet vitae. Aenean
+                  non neque mi. Nulla facilisi. Phasellus sit amet tellus tristique,
+                  maximus justo non, eleifend massa. Ut pharetra, felis et mollis
+                  sodales, risus lectus feugiat libero, a pretium ligula lectus
+                  non nisi. In hac habitasse platea dictumst. Nunc volutpat eros eu
+                  suscipit pharetra. Morbi ultrices ultricies nisi eu euismod.
+                </p>
+              </div>
+
+              {/* Lab */}
+              <div className="mb-3">
+                <p className="text-sm text-gray-500">Laboratorium</p>
+                <p className="text-black">Rekayasa Perangkat Lunak</p>
+              </div>
+
+              {/* Dosen Pembimbing */}
+              <div>
+                <p className="text-sm text-gray-500">Dosen Pembimbing</p>
+                <p className="text-black">Ir. John Doe S.Kom, M.Kom.</p>
+              </div>
+            </div>
+
+            {/* Garis */}
+            <div className="w-full h-[1px] bg-gray-400 my-4"></div>
+
+            {/* Tombol */}
+            <div className="flex justify-end">
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
+                Ambil Judul
+              </button>
+            </div>
           </div>
         </div>
       </div>
