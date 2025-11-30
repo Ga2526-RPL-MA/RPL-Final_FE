@@ -94,7 +94,8 @@ export default function Panduan() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+        <div className="bg-slate-200 flex-1 min-h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+
           {/* Path */}
           <div className="flex justify-start w-full text-gray-400 gap-2">
             <span>BERANDA</span>
@@ -102,11 +103,77 @@ export default function Panduan() {
             <span>PANDUAN</span>
           </div>
 
-          <h1 className="w-full text-2xl font-semibold text-black">
-            Panduan
-          </h1>
+          {/* Title */}
+          <h1 className="w-full text-2xl font-semibold text-black">Panduan</h1>
 
+          {/* Card Container */}
+          <div className="w-full flex flex-col gap-6 px-3 sm:px-1">
+
+            {/* CARD 1 */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Pedoman Penyusunan Laporan Tugas/Proyek Akhir Program Sarjana dan dan Sarjana Terapan
+              </h2>
+
+              <p className="text-gray-600 mt-1">
+                Pedoman Penyusunan Laporan Tugas/Proyek Akhir Bagi Mahasiswa Program Sarjana & Sarjana Terapan
+              </p>
+
+              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5
+               A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 
+               0L7.5 12m4.5 4.5V3"
+                  />
+                </svg>
+                Unduh Lampiran
+              </button>
+            </div>
+
+            {/* CARD 2 */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Buku Panduan Teknis Aplikasi
+              </h2>
+
+              <p className="text-gray-600 mt-1">
+                Panduan teknis penggunaan aplikasi iFinal
+              </p>
+
+              <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5
+               A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 
+               0L7.5 12m4.5 4.5V3"
+                  />
+                </svg>
+                Unduh Lampiran
+              </button>
+            </div>
+
+          </div>
         </div>
+
       </div>
     </div>
   );
