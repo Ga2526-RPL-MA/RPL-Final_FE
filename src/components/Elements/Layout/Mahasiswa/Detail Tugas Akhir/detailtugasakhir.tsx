@@ -105,7 +105,7 @@ export default function DetailTugasAkhir() {
           </div>
 
           <div className="w-full flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-black">
+            <h1 className="w-full text-2xl font-semibold text-black">
               Detail Tugas Akhir
             </h1>
           </div>

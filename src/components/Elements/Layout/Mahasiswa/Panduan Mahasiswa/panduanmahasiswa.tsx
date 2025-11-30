@@ -101,6 +101,11 @@ export default function Panduan() {
             <span>\</span>
             <span>PANDUAN</span>
           </div>
+
+          <h1 className="w-full text-2xl font-semibold text-black">
+            Panduan
+          </h1>
+
         </div>
       </div>
     </div>

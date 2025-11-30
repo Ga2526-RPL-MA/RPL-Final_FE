@@ -25,11 +25,9 @@ export default function LoginPage() {
       if (!res.ok) {
         throw new Error(data.message || "Login gagal, periksa email dan password");
       }
-      
-      // Save token ke cookie
+
       document.cookie = `access_token=${data.access_token}; path=/;`;
 
-      // Fetch user data (untuk role)
       const meRes = await fetch(`/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${data.access_token}`,
@@ -38,10 +36,8 @@ export default function LoginPage() {
 
       const meData = await meRes.json();
 
-      // Save ROLE ke cookie
       document.cookie = `role=${meData.profile?.role}; path=/;`;
 
-      // Redirect sesuai role
       if (meData.profile?.role === "MAHASISWA") {
         router.push("/mahasiswa/dashboard");
       } else if (meData.profile?.role === "DOSEN") {
@@ -49,7 +45,6 @@ export default function LoginPage() {
       } else {
         router.push("/");
       }
-
 
     } catch (err) {
       if (err instanceof Error) {
