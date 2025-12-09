@@ -56,14 +56,12 @@ export default function TawaranTugasAkhir() {
   );
 
   const handleNext = () => {
-    setCurrentPage(prev => (prev < totalPages ? prev + 1 : 1));
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : 1));
   };
 
   const handlePrev = () => {
-    setCurrentPage(prev => (prev > 1 ? prev - 1 : totalPages));
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : totalPages));
   };
-
-
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -178,62 +176,91 @@ export default function TawaranTugasAkhir() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading
                   ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                    <tr key={idx}>
-                      {Array.from({ length: 6 }).map((_, colIdx) => (
-                        <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                          <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                        </td>
-                      ))}
-                    </tr>
-                  ))
+                      <tr key={idx}>
+                        {Array.from({ length: 6 }).map((_, colIdx) => (
+                          <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))
                   : paginatedList.length > 0
-                    ? paginatedList.map((item, index) => (
+                  ? paginatedList.map((item, index) => (
                       <tr
                         key={item.id}
                         onClick={() =>
-                          router.push(`/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir?id=${item.id}`)
+                          router.push(
+                            `/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir/${item.id}`
+                          )
                         }
                         className="cursor-pointer hover:bg-gray-100 transition"
                       >
-
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.judul}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.deskripsi.length > 30 ? item.deskripsi.slice(0, 30) + "..." : item.deskripsi}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dosen?.nama || "-"}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.lab?.nama || "-"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {item.judul}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.deskripsi.length > 30
+                            ? item.deskripsi.slice(0, 30) + "..."
+                            : item.deskripsi}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.dosen?.nama || "-"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.lab?.nama || "-"}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === "Diambil" ? "bg-red-100 text-red-800" :
-                            item.status === "Draft" ? "bg-gray-100 text-gray-800" :
-                              item.status === "Published" ? "bg-blue-100 text-blue-800" :
-                                "bg-green-100 text-green-800"
-                            }`}>{item.status}</span>
+                          <span
+                            className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              item.status === "Diambil"
+                                ? "bg-red-100 text-red-800"
+                                : item.status === "Draft"
+                                ? "bg-gray-100 text-gray-800"
+                                : item.status === "Published"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
                         </td>
                       </tr>
                     ))
-                    : (
-                      <tr>
-                        <td colSpan={6} className="text-center py-4 text-gray-500">Belum ada data</td>
-                      </tr>
-                    )}
+                  : (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4 text-gray-500">
+                        Belum ada data
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
           <div className="w-full flex justify-between items-center mt-4">
-            <span className="text-sm text-gray-700">Page {currentPage} of {totalPages}</span>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
             <div className="flex gap-2">
               <button
                 onClick={handlePrev}
                 disabled={totalPages === 1}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${totalPages === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                  totalPages === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
                 disabled={totalPages === 1}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${totalPages === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                  totalPages === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 Next
               </button>

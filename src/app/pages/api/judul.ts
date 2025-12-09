@@ -1,13 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const response = await fetch(`/api/judul`, {
-    headers: {
-      Authorization: "Bearer YOUR_TOKEN_HERE", 
-    },
-  });
+  try {
+    const token = req.headers.authorization;
 
-  const data = await response.json();
+    const response = await fetch("https://final-api.up.railway.app/api/judul", {
+      headers: {
+        Authorization: token || "",
+      },
+    });
 
-  res.status(200).json(data);
+    const data = await response.json();
+    return res.status(response.status).json(data);
+
+  } catch (e) {
+    return res.status(500).json({ message: "Server error" });
+  }
 }
