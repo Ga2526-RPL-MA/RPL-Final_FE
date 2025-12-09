@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+
 import Link from "next/link";
-import { fetchJson } from "@/lib/api";
-import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
 
 interface Dosen {
   id: string;
@@ -37,83 +42,49 @@ interface Judul {
   lab?: Lab | null;
 }
 
-interface JudulDiambil {
-  id: string;
-  judul: string;
-  deskripsi: string;
-  status: string;
-  dosen?: { nama: string } | null;
-  lab?: { nama: string } | null;
-  mahasiswaId?: string;
-  mahasiswa?: { id: string };
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: Judul[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export default function MahasiswaDashboardPage() {
-  const [profileName, setProfileName] = useState<string>("");
-  const [profileEmail, setProfileEmail] = useState<string>("");
-  const [judulDiambil, setJudulDiambil] = useState<JudulDiambil | null>(null);
-  const [loadingJudul, setLoadingJudul] = useState(true);
+  const router = useRouter();
+  const [judulList, setJudulList] = useState<Judul[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredJudulList = judulList.filter(
+    (item) =>
+      item.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.dosen?.nama?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
 
   useEffect(() => {
-    async function fetchProfile() {
+    async function fetchJudul() {
       try {
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("access_token="))
-          ?.split("=")[1];
-        if (!token) return;
-        const me = await fetchJson("/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProfileName(me.profile?.nama || me.user?.email || "");
-        setProfileEmail(me.profile?.email || me.user?.email || "");
-      } catch (err) {
-        console.error("Error fetch profile:", err);
-      }
-    }
-    fetchProfile();
-  }, []);
+        const res = await fetch("/api/judul");
+        const json = await res.json();
+        setJudulList(json.data);
 
-  useEffect(() => {
-    async function fetchJudulDiambil() {
-      try {
-        const [judulData, meData] = await Promise.all([
-          fetchJson("/api/judul"),
-          fetchJson("/api/auth/me"),
-        ]);
-        
-        const profileId = meData.profile?.id || meData.user?.id || "";
-        const judulListData = Array.isArray(judulData.data) ? judulData.data : Array.isArray(judulData) ? judulData : [];
-        
-        const judulYangDiambil = judulListData.find(
-          (j: JudulDiambil) => 
-            j.mahasiswaId === profileId || j.mahasiswa?.id === profileId
-        );
-        
-        setJudulDiambil(judulYangDiambil || null);
       } catch (err) {
         console.error("Error fetch judul:", err);
-        setJudulDiambil(null);
       } finally {
-        setLoadingJudul(false);
+        setLoading(false);
       }
     }
-    fetchJudulDiambil();
+
+    fetchJudul();
   }, []);
-
-  const getCurrentDate = () => {
-    const today = new Date();
-    const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    return {
-      day: days[today.getDay()],
-      date: today.getDate(),
-      month: months[today.getMonth()],
-      year: today.getFullYear(),
-    };
-  };
-
-  const currentDate = getCurrentDate();
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -180,62 +151,48 @@ export default function MahasiswaDashboardPage() {
               </div>
             </Link>
 
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm text-white p-4 flex items-center justify-between">
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-bold">{currentDate.day}</h2>
-                <p className="text-sm">{currentDate.date} {currentDate.month} {currentDate.year}</p>
+          {/* Sub Sidebar */}
+          <div className="w-full h-[220px] flex flex-col">
+            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+              <i className="bi bi-gear text-xl"></i>
+              <h1 className="font-medium">Pengaturan</h1>
+            </div>
+            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="font-medium">John Doe</h1>
+                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
               </div>
-              <div className="flex flex-col items-end">
-                <p className="text-sm">Agenda Hari Ini:</p>
-                <p className="text-sm font-semibold">Seminar Proposal</p>
+              <div className=" ml-8">
+                <i className="bi bi-box-arrow-left text-xl"></i>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Judul Tugas Akhir Saya</h3>
-            {loadingJudul ? (
-              <div className="text-center py-4 text-gray-500 text-sm">Memuat data...</div>
-            ) : judulDiambil ? (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">{judulDiambil.judul}</h4>
-                    <p className="text-xs text-gray-600 mb-3">
-                      {judulDiambil.deskripsi?.length > 150 
-                        ? judulDiambil.deskripsi.slice(0, 150) + "..." 
-                        : judulDiambil.deskripsi || "-"}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                      <span className="flex items-center gap-1">
-                        <i className="bi bi-person"></i>
-                        Dosen: {judulDiambil.dosen?.nama || "-"}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <i className="bi bi-building"></i>
-                        Lab: {judulDiambil.lab?.nama || "-"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        judulDiambil.status === "DIAMBIL" 
-                          ? "bg-orange-100 text-orange-800"
-                          : judulDiambil.status === "SELESAI"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}>
-                        {judulDiambil.status === "DIAMBIL" ? "Diambil" : judulDiambil.status === "SELESAI" ? "Selesai" : judulDiambil.status}
-                      </span>
-                    </div>
-                  </div>
-                  <Link
-                    href={`/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir/${judulDiambil.id}`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium whitespace-nowrap flex items-center gap-1"
-                  >
-                    Lihat Detail
-                    <i className="bi bi-arrow-right"></i>
-                  </Link>
-                </div>
+        {/* Main Content */}
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+          {/* Path */}
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">BERANDA</div>
+
+          {/* Main Header */}
+          <div className="bg-white w-[1280px] h-[219px] rounded-lg shadow-md border border-gray-400">
+            <div className="flex items-center justify-center h-full gap-6 mr-120">
+              <Avatar className="w-40 h-40">
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+
+              <div className="flex flex-col items-start">
+                <h1 className="text-black text-3xl font-bold">
+                  Selamat Datang, Jhon Doe
+                </h1>
+                <h2 className="text-gray-700 text-lg font-medium mt-1">
+                  Mahasiswa
+                </h2>
               </div>
             ) : (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
@@ -252,17 +209,75 @@ export default function MahasiswaDashboardPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Pengumuman</h3>
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 rounded-md px-3 py-2">
-                  <i className="bi bi-bell"></i>
-                  <span>We've just released a new feature</span>
-                </div>
-              ))}
+          {/* Sub Main */}
+          <div className="border w-[1280px] border-gray-300 bg-white rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl font-semibold text-black">
+                Tawaran Judul Yang Tersedia
+              </h1>
+
+              <input
+                type="text"
+                placeholder="Cari judul atau dosen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="border border-dotted border-gray-400 rounded-lg overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gray-100 border-b border-gray-300">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Judul</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Dosen Pembimbing</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Laboratorium</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                  </tr>
+                </thead>
+
+                <tbody className="bg-white">
+                  {filteredJudulList.length > 0 ? (
+                    filteredJudulList.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        onClick={() => router.push(`/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir?id=${item.id}`)}
+                        className="cursor-pointer hover:bg-gray-50 transition border-b border-gray-200"
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">{item.judul}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{item.dosen?.nama || "-"}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{item.lab?.nama || "-"}</td>
+
+                        <td className="px-6 py-4 text-sm">
+                          <span
+                            className={`px-3 py-1 text-xs font-semibold rounded-full 
+                    ${item.status === "DIAMBIL"
+                                ? "bg-red-100 text-red-800"
+                                : item.status === "PUBLISHED"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : "bg-green-100 text-green-800"
+                              }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="py-4 text-center text-gray-500">
+                        Belum ada data
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
+
+
         </div>
       </div>
     </div>

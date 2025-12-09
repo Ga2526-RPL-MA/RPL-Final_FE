@@ -84,15 +84,50 @@ export default function MonitorPage() {
       </div>
 
       <div className="flex flex-1">
-        <SidebarDosen />
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
-          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
-            <span>BERANDA</span>
-            <span>&gt;</span>
-            <span>MONITORING</span>
-          </div>
+        {/* Sidebar kiri */}
+        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
+          {/* Main Sidebar */}
+          <div className="w-full h-[225px] mt-[30px] flex flex-col">
 
-          <h1 className="text-2xl font-bold text-black">Monitoring</h1>
+            <Link href="/dosen/dashboard">
+              {/* Menu 1 */}
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-house-door text-xl"></i>
+                <h1 className="font-medium">Beranda</h1>
+              </div>
+            </Link>
+
+            <Link href="/dosen/dashboard/tawaranjudul">
+              {/* Menu 2 */}
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-people-fill text-xl"></i>
+                <h1 className="font-medium">Tawaran Judul</h1>
+              </div>
+            </Link>
+
+            <Link href="/dosen/dashboard/manajemen-judul">
+              {/* Menu 3 */}
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-book text-xl"></i>
+                <h1 className="font-medium">Manajemen Judul</h1>
+              </div>
+            </Link>
+
+            <Link href="/dosen/dashboard/monitoring">
+              {/* Menu 4 */}
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-display text-xl"></i>
+                <h1 className="font-medium">Monitoring</h1>
+              </div>
+            </Link>
+
+            <Link href="/dosen/dashboard/panduandosen">
+              {/* Menu 5 */}
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-file-earmark text-xl"></i>
+                <h1 className="font-medium">Panduan</h1>
+              </div>
+            </Link>
 
           <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
             <table className="min-w-full divide-y divide-gray-200">
@@ -154,31 +189,35 @@ export default function MonitorPage() {
               </tbody>
             </table>
           </div>
-
-          <div className="w-full flex justify-between items-center">
-            <span className="text-sm text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
-            <div className="flex gap-2">
-              <button
-                onClick={handlePrev}
-                disabled={currentPage === 1}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={handleNext}
-                disabled={currentPage === totalPages}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                Next
-              </button>
+          {/* Sub Sidebar */}
+          <div className="w-full h-[220px] flex flex-col">
+            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+              <i className="bi bi-gear text-xl"></i>
+              <h1 className="font-medium">Pengaturan</h1>
             </div>
+            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="font-medium">John Doe</h1>
+                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
+              </div>
+              <div className=" ml-8">
+                <i className="bi bi-box-arrow-left text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+          {/* Path */}
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
+            <span>BERANDA</span>
+            <span>&gt;</span>
+            <span>MONITORING</span>
           </div>
         </div>
       </div>

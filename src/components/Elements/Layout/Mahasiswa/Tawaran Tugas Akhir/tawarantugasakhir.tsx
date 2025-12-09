@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { fetchJson } from "@/lib/api";
-import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
+import Link from "next/link";
 
 interface Judul {
   id: string;
@@ -21,7 +21,7 @@ interface Lab {
   nama: string;
 }
 
-export default function TawaranTugasAkhir() {
+export default function TawaranJudulPage() {
   const router = useRouter();
   const [judulList, setJudulList] = useState<Judul[]>([]);
   const [loading, setLoading] = useState(true);
@@ -142,16 +142,71 @@ export default function TawaranTugasAkhir() {
         </div>
       </div>
 
+      {/* Main Sidebar */}
       <div className="flex flex-1">
-        <SidebarMahasiswa />
+        {/* Sidebar kiri */}
+        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
+          {/* Main Sidebar */}
+          <div className="w-full h-[180px] mt-[30px] flex flex-col">
+            <Link href="/mahasiswa/dashboard">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-house-door text-xl"></i>
+                <h1 className="font-medium">Beranda</h1>
+              </div>
+            </Link>
+
+            <Link href="/mahasiswa/dashboard/tawarantugasakhir">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-people-fill text-xl"></i>
+                <h1 className="font-medium">Tawaran Judul Tugas Akhir</h1>
+              </div>
+            </Link>
+
+            <Link href="/mahasiswa/dashboard/progresstugasakhir">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-book text-xl"></i>
+                <h1 className="font-medium">Progress Tugas Akhir</h1>
+              </div>
+            </Link>
+
+            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-file-earmark text-xl"></i>
+                <h1 className="font-medium">Panduan</h1>
+              </div>
+            </Link>
+          </div>
+
+          {/* Sub Sidebar */}
+          <div className="w-full h-[220px] flex flex-col">
+            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+              <i className="bi bi-gear text-xl"></i>
+              <h1 className="font-medium">Pengaturan</h1>
+            </div>
+            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="font-medium">John Doe</h1>
+                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
+              </div>
+              <div className=" ml-8">
+                <i className="bi bi-box-arrow-left text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
           <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
             <span>&gt;</span>
-            <span>TAWARAN JUDUL TUGAS AKHIR</span>
+            <span>TAWARAN JUDUL</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-black">Tawaran Judul Tugas Akhir</h1>
+          <h1 className="text-2xl font-bold text-black">Tawaran Judul</h1>
 
           <div className="flex gap-4 items-center">
             <div className="flex-1 relative">

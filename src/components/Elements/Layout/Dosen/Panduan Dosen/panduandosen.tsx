@@ -29,7 +29,10 @@ export default function PanduanDosen() {
       <div className="flex flex-1">
         <SidebarDosen />
 
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+        {/* Main Content */}
+        <div className="bg-slate-200 flex-1 min-h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+
+          {/* Path */}
           <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
             <span>&gt;</span>
