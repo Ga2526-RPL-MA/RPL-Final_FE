@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { fetchJson } from "@/lib/api";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
 
 interface Dosen {
   nama: string;
@@ -28,8 +28,6 @@ interface JudulDetail {
 
 export default function DetailTugasAkhir() {
   const router = useRouter();
-  const [profileName, setProfileName] = useState<string>("");
-  const [profileEmail, setProfileEmail] = useState<string>("");
   const searchParams = useSearchParams();
   const routeParams = useParams<{ id?: string }>();
   const id = routeParams?.id || searchParams.get("id") || "";
@@ -37,6 +35,16 @@ export default function DetailTugasAkhir() {
   const [data, setData] = useState<JudulDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+  const [successModal, setSuccessModal] = useState<{
+    show: boolean;
+    message: string;
+  } | null>(null);
 
   const fetchDetail = useCallback(async () => {
     setLoading(true);
@@ -78,7 +86,10 @@ export default function DetailTugasAkhir() {
         ?.split("=")[1];
 
       if (!token) {
-        alert("Token tidak ditemukan. Silakan login ulang.");
+        setSuccessModal({
+          show: true,
+          message: "Token tidak ditemukan. Silakan login ulang.",
+        });
         return;
       }
 
@@ -87,32 +98,34 @@ export default function DetailTugasAkhir() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      alert("Judul berhasil diambil!");
+      setSuccessModal({
+        show: true,
+        message: "Judul berhasil diambil!",
+      });
       fetchDetail();
     } catch (err: any) {
-      alert("Gagal mengambil judul: " + (err?.message || "Terjadi kesalahan."));
+      setSuccessModal({
+        show: true,
+        message: "Gagal mengambil judul: " + (err?.message || "Terjadi kesalahan."),
+      });
     }
   };
 
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const token = document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("access_token="))
-          ?.split("=")[1];
-        if (!token) return;
-        const me = await fetchJson("/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProfileName(me.profile?.nama || me.user?.email || "");
-        setProfileEmail(me.profile?.email || me.user?.email || "");
-      } catch (err) {
-        console.error("Error fetch profile:", err);
-      }
-    }
-    fetchProfile();
-  }, []);
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; className: string }> = {
+      DIAMBIL: { label: "Diambil", className: "bg-orange-100 text-orange-800" },
+      DRAFT: { label: "Draft", className: "bg-gray-100 text-gray-800" },
+      PUBLISHED: { label: "Published", className: "bg-blue-100 text-blue-800" },
+      BELUM_DIAMBIL: { label: "Belum Diambil", className: "bg-blue-50 text-blue-700" },
+      SELESAI: { label: "Selesai", className: "bg-green-100 text-green-800" },
+    };
+    const mapped = statusMap[status] || { label: status, className: "bg-gray-100 text-gray-800" };
+    return (
+      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${mapped.className}`}>
+        {mapped.label}
+      </span>
+    );
+  };
 
   const statusLabel =
     data?.status === "BELUM_DIAMBIL"
@@ -123,11 +136,10 @@ export default function DetailTugasAkhir() {
           ? "Published"
           : data?.status;
 
-  const isAvailable = data?.status === "BELUM_DIAMBIL";
+  const isAvailable = data?.status === "BELUM_DIAMBIL" || data?.status === "PUBLISHED";
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* Header */}
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
         <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
           <div className="flex items-center">
@@ -146,158 +158,135 @@ export default function DetailTugasAkhir() {
         </div>
       </div>
 
-      {/* Sidebar + Main */}
       <div className="flex flex-1">
-        {/* Sidebar */}
-        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-          <div className="w-full h-[180px] mt-[30px] flex flex-col">
-            <Link href="/mahasiswa/dashboard">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-house-door text-xl"></i>
-                <h1 className="font-medium">Beranda</h1>
-              </div>
-            </Link>
-            <Link href="/mahasiswa/dashboard/tawarantugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-people-fill text-xl"></i>
-                <h1 className="font-medium">Tawaran Judul Tugas Akhir</h1>
-              </div>
-            </Link>
-            <Link href="/mahasiswa/dashboard/progresstugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-book text-xl"></i>
-                <h1 className="font-medium">Progress Tugas Akhir</h1>
-              </div>
-            </Link>
-            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-file-earmark text-xl"></i>
-                <h1 className="font-medium">Panduan</h1>
-              </div>
-            </Link>
-          </div>
-
-          {/* Sub Sidebar */}
-          <div className="w-full h-[220px] flex flex-col">
-            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-              <i className="bi bi-gear text-xl"></i>
-              <h1 className="font-medium">Pengaturan</h1>
-            </div>
-            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
-                <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="font-medium">{profileName || "Pengguna"}</h1>
-                <h1 className="font-small text-gray-500">{profileEmail || ""}</h1>
-              </div>
-              <div className=" ml-8">
-                <button
-                  aria-label="Logout"
-                  onClick={async () => {
-                    try {
-                      await fetchJson("/api/auth/logout", { method: "POST" });
-                    } catch (e) {
-                      console.error("Logout failed", e);
-                    } finally {
-                      document.cookie = "access_token=; path=/; max-age=0";
-                      document.cookie = "role=; path=/; max-age=0";
-                      router.push("/auth/login");
-                    }
-                  }}
-                >
-                  <i className="bi bi-box-arrow-left text-xl"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
-          <div className="flex justify-start w-full text-gray-400 gap-2">
+        <SidebarMahasiswa />
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
-            <span>\</span>
+            <span>&gt;</span>
             <span>TAWARAN JUDUL TUGAS AKHIR</span>
-            <span>\</span>
+            <span>&gt;</span>
             <span>DETAIL TUGAS AKHIR</span>
           </div>
 
-          <div className="w-full flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-black">Detail Tugas Akhir</h1>
-          </div>
+          <h1 className="text-2xl font-bold text-black">Detail Tugas Akhir</h1>
 
           {loading ? (
-            <p>Loading...</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-500">Memuat data...</p>
+            </div>
           ) : errorMsg ? (
-            <p className="text-red-500">{errorMsg}</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <p className="text-red-500">{errorMsg}</p>
+            </div>
           ) : data ? (
-            <div className="w-full bg-white border border-gray-300 rounded-xl p-6">
-              {/* Judul + Status */}
-              <div className="border border-dotted border-gray-400 p-4 rounded-lg">
-                <div className="flex justify-between items-start">
-                  <h1 className="text-2xl font-semibold text-black">{data.judul}</h1>
-                  <span
-                    className={`px-3 py-1 text-xs font-semibold rounded-full ${data.status === "PUBLISHED"
-                        ? "bg-blue-100 text-blue-800"
-                        : data.status === "DIAMBIL"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                  >
-                    {statusLabel}
-                  </span>
-                </div>
-
-                <p className="text-sm text-gray-500 mt-2">
-                  Dibuat pada: {new Date(data.createdAt).toLocaleDateString("id-ID")}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Dibuat oleh: {data.dosen?.nama ?? "-"}
-                </p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+              <div className="flex items-start justify-between">
+                <h1 className="text-2xl font-bold text-gray-900">{data.judul}</h1>
+                {getStatusBadge(data.status)}
               </div>
 
-              <div className="w-full h-[1px] bg-gray-400 my-4"></div>
-
-              {/* Informasi */}
-              <h1 className="text-2xl font-semibold text-black mb-2">Informasi</h1>
-              <div className="border border-dotted border-gray-400 p-4 rounded-lg">
-                <div className="mb-3">
-                  <p className="text-sm text-gray-500">Judul</p>
-                  <p className="text-black">{data.judul}</p>
-                </div>
-
-                <div className="mb-3">
-                  <p className="text-sm text-gray-500">Deskripsi</p>
-                  <p className="text-black text-justify">{data.deskripsi}</p>
-                </div>
-
-                <div className="mb-3">
-                  <p className="text-sm text-gray-500">Laboratorium</p>
-                  <p className="text-black">{data.lab?.nama ?? "-"}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Dosen Pembimbing</p>
+                  <p className="font-medium text-gray-900">{data.dosen?.nama ?? "-"}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-gray-500">Dosen Pembimbing</p>
-                  <p className="text-black">{data.dosen?.nama ?? "-"}</p>
+                  <p className="text-sm text-gray-500 mb-1">Laboratorium</p>
+                  <p className="font-medium text-gray-900">{data.lab?.nama ?? "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Status</p>
+                  {getStatusBadge(data.status)}
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Tanggal Upload</p>
+                  <p className="font-medium text-gray-900">
+                    {new Date(data.createdAt).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
                 </div>
               </div>
 
-              <div className="w-full h-[1px] bg-gray-400 my-4"></div>
-
-              {/* Tombol */}
-              <div className="flex justify-end">
-                <Button disabled={!isAvailable} onClick={handleAmbilJudul}>
-                  Ambil Judul
-                </Button>
+              <div className="p-4 border border-gray-200 rounded-lg bg-white">
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">Deskripsi</h2>
+                <p className="text-gray-700 whitespace-pre-line leading-relaxed">{data.deskripsi}</p>
               </div>
+
+              {isAvailable && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      setConfirmModal({
+                        show: true,
+                        title: "Ambil Judul",
+                        message: "Apakah Anda yakin ingin mengambil judul ini?",
+                        onConfirm: handleAmbilJudul,
+                      });
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition"
+                  >
+                    Ambil Judul
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            <p>Data tidak ditemukan</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <p className="text-gray-500">Data tidak ditemukan</p>
+            </div>
           )}
         </div>
       </div>
+
+      {confirmModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 border border-gray-300 w-[400px]">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{confirmModal.title}</h3>
+            <p className="text-gray-600 mb-6">{confirmModal.message}</p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  confirmModal.onConfirm();
+                  setConfirmModal(null);
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Ya, Ambil
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {successModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 border border-gray-300 w-[400px]">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Notifikasi</h3>
+            <p className="text-gray-600 mb-6">{successModal.message}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setSuccessModal(null)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
