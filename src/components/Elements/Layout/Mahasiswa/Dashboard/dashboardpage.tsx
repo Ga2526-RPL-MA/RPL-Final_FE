@@ -88,10 +88,8 @@ export default function MahasiswaDashboardPage() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* Header */}
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
+      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-300 bg-[#f4f6fb]">
         <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          {/* Logo */}
           <div className="flex items-center">
             <div
               className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
@@ -99,51 +97,59 @@ export default function MahasiswaDashboardPage() {
             ></div>
             <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
           </div>
-
-          {/* Avatar */}
           <div className="flex items-center">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+              <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
           </div>
         </div>
       </div>
 
-      {/* Main Sidebar */}
-      <div className="flex flex-1">
-        {/* Sidebar kiri */}
-        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-          {/* Main Sidebar */}
-          <div className="w-full h-[180px] mt-[30px] flex flex-col">
-            <Link href="/mahasiswa/dashboard">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-house-door text-xl"></i>
-                <h1 className="font-medium">Beranda</h1>
-              </div>
-            </Link>
+      <div className="flex flex-1 bg-[#f4f6fb]">
+        <SidebarMahasiswa />
 
-            <Link href="/mahasiswa/dashboard/tawarantugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-people-fill text-xl"></i>
-                <h1 className="font-medium">Tawaran Judul Tugas Akhir</h1>
-              </div>
-            </Link>
-
-            <Link href="/mahasiswa/dashboard/progresstugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-book text-xl"></i>
-                <h1 className="font-medium">Progress Tugas Akhir</h1>
-              </div>
-            </Link>
-
-            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-file-earmark text-xl"></i>
-                <h1 className="font-medium">Panduan</h1>
-              </div>
-            </Link>
+        <div className="flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-6">
+            <Avatar className="w-20 h-20">
+              <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+              <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <p className="text-sm text-gray-600">Mahasiswa</p>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                {profileName ? `Selamat datang, ${profileName}` : "Selamat datang"}
+              </h1>
+              <p className="text-sm text-gray-500">{profileEmail}</p>
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link 
+              href="/mahasiswa/dashboard/tawarantugasakhir"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center text-blue-600">
+                <i className="bi bi-search"></i>
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-sm font-semibold text-gray-900">Tawaran Judul</h3>
+                <p className="text-sm text-gray-600">Lihat judul tugas akhir yang tersedia.</p>
+              </div>
+            </Link>
+
+            <Link 
+              href="/mahasiswa/dashboard/progresstugasakhir"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center text-blue-600">
+                <i className="bi bi-book"></i>
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-sm font-semibold text-gray-900">Progress Tugas Akhir</h3>
+                <p className="text-sm text-gray-600">Laporkan dan lihat progress tugas akhir Anda.</p>
+              </div>
+            </Link>
 
           {/* Sub Sidebar */}
           <div className="w-full h-[220px] flex flex-col">
@@ -188,7 +194,19 @@ export default function MahasiswaDashboardPage() {
                   Mahasiswa
                 </h2>
               </div>
-            </div>
+            ) : (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                <i className="bi bi-folder-x text-4xl text-gray-400 mb-2"></i>
+                <p className="text-sm text-gray-600 mb-3">Anda belum mengambil judul tugas akhir</p>
+                <Link
+                  href="/mahasiswa/dashboard/tawarantugasakhir"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center gap-1"
+                >
+                  Lihat Tawaran Judul
+                  <i className="bi bi-arrow-right"></i>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Sub Main */}

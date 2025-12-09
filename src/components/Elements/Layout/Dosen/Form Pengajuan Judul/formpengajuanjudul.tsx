@@ -647,7 +647,7 @@ export default function FormPengajuanJudulPage() {
             <span>BERANDA</span>
             <span>&gt;</span>
             <span>MANAJEMEN JUDUL</span>
-          </div>
+              </div>
 
           <h1 className="text-2xl font-bold text-black">Manajemen Judul</h1>
 
@@ -691,7 +691,7 @@ export default function FormPengajuanJudulPage() {
               <i className="bi bi-plus-lg text-lg"></i>
               Ajukan Judul Baru
             </button>
-          </div>
+              </div>
 
           {activeTab === "daftar" && (
             <>
@@ -856,8 +856,8 @@ export default function FormPengajuanJudulPage() {
                   >
                     Next
                   </button>
-                </div>
               </div>
+          </div>
             </>
           )}
 
@@ -873,7 +873,7 @@ export default function FormPengajuanJudulPage() {
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                </div>
+            </div>
                 <div className="relative filter-dropdown">
                   <button
                     onClick={() => setShowFilter(!showFilter)}
@@ -891,7 +891,7 @@ export default function FormPengajuanJudulPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="space-y-4">
-                        <div>
+              <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Progress
                           </label>
@@ -910,7 +910,7 @@ export default function FormPengajuanJudulPage() {
                             <option value="Bab 5">Bab 5</option>
                             <option value="Selesai">Selesai</option>
                           </select>
-                        </div>
+              </div>
                         <button
                           onClick={() => {
                             setFilterProgress("");
@@ -919,11 +919,11 @@ export default function FormPengajuanJudulPage() {
                         >
                           Reset Filter
                         </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
+            </div>
+                  )}
+          </div>
+        </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -1037,7 +1037,7 @@ export default function FormPengajuanJudulPage() {
                   />
                   <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
-              </div>
+          </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -1144,7 +1144,7 @@ export default function FormPengajuanJudulPage() {
                     }`}
                   >
                     Next
-                  </button>
+            </button>
                 </div>
               </div>
             </>
@@ -1202,7 +1202,7 @@ export default function FormPengajuanJudulPage() {
                   {labs.map((lab) => (
                     <option key={lab.id} value={lab.id}>
                       {lab.nama}
-                    </option>
+                  </option>
                   ))}
                 </select>
               </div>
@@ -1281,8 +1281,8 @@ export default function FormPengajuanJudulPage() {
               >
                 OK
               </button>
-            </div>
-          </div>
+        </div>
+      </div>
         </div>
       )}
     </div>
