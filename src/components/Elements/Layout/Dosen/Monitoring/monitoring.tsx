@@ -54,11 +54,11 @@ export default function MonitorPage() {
             </div>
             </Link>
 
-            <Link href="/dosen/dashboard/formpengajuanjudul">
+            <Link href="/dosen/dashboard/manajemen-judul">
             {/* Menu 3 */}
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-book text-xl"></i>
-              <h1 className="font-medium">Form Pengajuan Judul</h1>
+              <h1 className="font-medium">Manajemen Judul</h1>
             </div>
             </Link>
 

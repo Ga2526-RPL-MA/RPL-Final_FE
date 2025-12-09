@@ -1,7 +1,8 @@
 import FormPengajuanJudulPage from "@/components/Elements/Layout/Dosen/Form Pengajuan Judul/formpengajuanjudul";
 
-export default function FormPengajuanJudul() {
+export default function ManajemenJudul() {
     return (
         <FormPengajuanJudulPage />
     );
 }
+
