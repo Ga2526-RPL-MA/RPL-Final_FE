@@ -9,7 +9,7 @@ import { fetchJson } from "@/lib/api"
 const menu = [
   { href: "/dosen/dashboard", icon: "bi bi-house-door", label: "Beranda" },
   { href: "/dosen/dashboard/tawaranjudul", icon: "bi bi-people-fill", label: "Tawaran Judul" },
-  { href: "/dosen/dashboard/formpengajuanjudul", icon: "bi bi-book", label: "Form Pengajuan Judul" },
+  { href: "/dosen/dashboard/formpengajuanjudul", icon: "bi bi-book", label: "Manajemen Judul" },
   { href: "/dosen/dashboard/monitoring", icon: "bi bi-display", label: "Monitoring" },
   { href: "/dosen/dashboard/panduandosen", icon: "bi bi-file-earmark", label: "Panduan" },
 ]

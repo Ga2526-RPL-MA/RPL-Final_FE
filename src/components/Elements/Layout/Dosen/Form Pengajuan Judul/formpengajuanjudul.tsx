@@ -1,18 +1,496 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+"use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { fetchJson } from "@/lib/api";
+import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
+
+interface Judul {
+  id: string;
+  judul: string;
+  deskripsi: string;
+  lab?: { id: string; nama: string };
+  labId?: string;
+  dosenId?: string;
+  status: string;
+}
+
+interface Lab {
+  id: string;
+  nama: string;
+}
+
+interface Profile {
+  id: string;
+  nama: string;
+  email: string;
+  role: string;
+  labId?: string;
+}
+
+interface ProgressTerakhir {
+  id: string;
+  tahap: string;
+  deskripsi: string;
+  createdAt: string;
+}
+
+interface JudulMahasiswa {
+  id: string;
+  judul: string;
+  deskripsi: string;
+  status: string;
+  lab: { id: string; nama: string };
+  progressTerakhir: ProgressTerakhir | null;
+  createdAt: string;
+}
+
+interface MahasiswaBimbingan {
+  id: string;
+  nama: string;
+  email: string;
+  lab: { id: string; nama: string };
+  judul: JudulMahasiswa[];
+}
+
+interface PendingRequest {
+  id: string;
+  judulId: string;
+  mahasiswaId: string;
+  status: string;
+  judul: {
+    id: string;
+    judul: string;
+    status: string;
+  };
+  mahasiswa: {
+    id: string;
+    nama: string;
+    email: string;
+  };
+}
 
 export default function FormPengajuanJudulPage() {
+  const [judulList, setJudulList] = useState<Judul[]>([]);
+  const [filteredJudulList, setFilteredJudulList] = useState<Judul[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("daftar");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [editingJudul, setEditingJudul] = useState<Judul | null>(null);
+  const [labs, setLabs] = useState<Lab[]>([]);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [formData, setFormData] = useState({
+    judul: "",
+    deskripsi: "",
+    labId: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    onConfirm: () => void;
+  } | null>(null);
+  const [successModal, setSuccessModal] = useState<{
+    show: boolean;
+    message: string;
+  } | null>(null);
+  const [mahasiswaList, setMahasiswaList] = useState<MahasiswaBimbingan[]>([]);
+  const [mahasiswaLoading, setMahasiswaLoading] = useState(false);
+  const [mahasiswaPage, setMahasiswaPage] = useState(1);
+  const [mahasiswaTotalPages, setMahasiswaTotalPages] = useState(1);
+  const [pendingList, setPendingList] = useState<PendingRequest[]>([]);
+  const [pendingLoading, setPendingLoading] = useState(false);
+  const [pendingPage, setPendingPage] = useState(1);
+  const [pendingTotalPages, setPendingTotalPages] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [judulData, labsData, meData] = await Promise.all([
+          fetchJson("/api/judul"),
+          fetchJson("/api/labs"),
+          fetchJson("/api/auth/me"),
+        ]);
+        setJudulList(Array.isArray(judulData.data) ? judulData.data : Array.isArray(judulData) ? judulData : []);
+        setLabs(Array.isArray(labsData.data) ? labsData.data : Array.isArray(labsData) ? labsData : []);
+        setProfile(meData.profile);
+        if (meData.profile?.labId) {
+          setFormData((prev) => ({ ...prev, labId: meData.profile.labId }));
+        }
+      } catch (err) {
+        console.error("Error fetch data:", err);
+        setJudulList([]);
+        setLabs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (profile && judulList.length > 0) {
+      const filtered = judulList.filter((judul) => judul.dosenId === profile.id);
+      setFilteredJudulList(filtered);
+    }
+  }, [profile, judulList]);
+
+  useEffect(() => {
+    if (activeTab === "mahasiswa") {
+      setMahasiswaPage(1);
+    } else if (activeTab === "daftar") {
+      setCurrentPage(1);
+    } else if (activeTab === "pending") {
+      setPendingPage(1);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === "mahasiswa") {
+      const fetchMahasiswa = async () => {
+        setMahasiswaLoading(true);
+        try {
+          const data = await fetchJson(`/api/dosen/mahasiswa?page=${mahasiswaPage}&limit=${itemsPerPage}`);
+          setMahasiswaList(data.data || []);
+          setMahasiswaTotalPages(Math.ceil((data.total || 0) / itemsPerPage));
+        } catch (err) {
+          console.error("Error fetch mahasiswa:", err);
+          setMahasiswaList([]);
+        } finally {
+          setMahasiswaLoading(false);
+        }
+      };
+      fetchMahasiswa();
+    } else if (activeTab === "pending") {
+      const fetchPending = async () => {
+        setPendingLoading(true);
+        try {
+          const data = await fetchJson(`/api/judul/requests?status=PENDING`);
+          const requests = data.data || [];
+          setPendingList(requests);
+          setPendingTotalPages(Math.ceil(requests.length / itemsPerPage));
+        } catch (err) {
+          console.error("Error fetch pending:", err);
+          setPendingList([]);
+        } finally {
+          setPendingLoading(false);
+        }
+      };
+      fetchPending();
+    }
+  }, [activeTab, mahasiswaPage]);
+
+  const totalPages = Math.ceil(filteredJudulList.length / itemsPerPage);
+  const paginatedList = filteredJudulList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleNext = () => {
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev));
+  };
+
+  const handlePrev = () => {
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
+  const handleOpenModal = (judul?: Judul) => {
+    if (judul) {
+      setEditingJudul(judul);
+      setFormData({
+        judul: judul.judul,
+        deskripsi: judul.deskripsi,
+        labId: judul.labId || judul.lab?.id || "",
+      });
+    } else {
+      setEditingJudul(null);
+      setFormData({
+        judul: "",
+        deskripsi: "",
+        labId: profile?.labId || "",
+      });
+    }
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingJudul(null);
+    setFormData({
+      judul: "",
+      deskripsi: "",
+      labId: profile?.labId || "",
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      if (editingJudul) {
+        await fetchJson(`/api/judul/${editingJudul.id}/dosen`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            judul: formData.judul,
+            deskripsi: formData.deskripsi,
+            labId: formData.labId,
+          }),
+        });
+      } else {
+        await fetchJson("/api/judul", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            judul: formData.judul,
+            deskripsi: formData.deskripsi,
+            labId: formData.labId,
+          }),
+        });
+      }
+      const data = await fetchJson("/api/judul");
+      const updatedList = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
+      setJudulList(updatedList);
+      handleCloseModal();
+      setSuccessModal({
+        show: true,
+        message: editingJudul ? "Judul berhasil diperbarui" : "Judul berhasil diajukan",
+      });
+    } catch (err) {
+      console.error("Error submit:", err);
+      setSuccessModal({
+        show: true,
+        message: "Gagal menyimpan judul",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleConfirm = (judulId: string) => {
+    setConfirmModal({
+      show: true,
+      title: "Konfirmasi Status",
+      message: "Apakah Anda yakin ingin mengubah status judul ini menjadi 'Belum Diambil'?",
+      confirmText: "Ya, Ubah Status",
+      onConfirm: async () => {
+        setConfirmModal(null);
+        try {
+          await fetchJson(`/api/judul/${judulId}/confirm`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await fetchJson("/api/judul");
+          const updatedList = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
+          setJudulList(updatedList);
+          setSuccessModal({
+            show: true,
+            message: "Status judul berhasil diubah menjadi 'Belum Diambil'",
+          });
+        } catch (err) {
+          console.error("Error confirm:", err);
+          const errorMessage = err instanceof Error ? err.message : "Gagal mengubah status judul";
+          setSuccessModal({
+            show: true,
+            message: errorMessage,
+          });
+        }
+      },
+    });
+  };
+
+  const handleDelete = (judulId: string, judulName: string) => {
+    setConfirmModal({
+      show: true,
+      title: "Hapus Judul",
+      message: "Apakah Anda yakin ingin menghapus judul ini?",
+      confirmText: "Ya, Hapus Judul",
+      onConfirm: async () => {
+        setConfirmModal(null);
+        try {
+          await fetchJson(`/api/judul/${judulId}`, {
+            method: "DELETE",
+          });
+          const data = await fetchJson("/api/judul");
+          const updatedList = Array.isArray(data.data) ? data.data : Array.isArray(data) ? data : [];
+          setJudulList(updatedList);
+          setSuccessModal({
+            show: true,
+            message: "Judul berhasil dihapus",
+          });
+        } catch (err) {
+          console.error("Error delete:", err);
+          const errorMessage = err instanceof Error ? err.message : "Gagal menghapus judul";
+          setSuccessModal({
+            show: true,
+            message: errorMessage,
+          });
+        }
+      },
+    });
+  };
+
+  const handleApprove = (judulId: string, mahasiswaId: string, mahasiswaName: string) => {
+    setConfirmModal({
+      show: true,
+      title: "Setujui Permintaan",
+      message: `Apakah Anda yakin ingin menyetujui permintaan dari ${mahasiswaName}?`,
+      confirmText: "Ya, Setujui",
+      onConfirm: async () => {
+        setConfirmModal(null);
+        try {
+          await fetchJson(`/api/judul/${judulId}/approve`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mahasiswaId }),
+          });
+          const data = await fetchJson(`/api/judul/requests?status=PENDING`);
+          setPendingList(data.data || []);
+          setSuccessModal({
+            show: true,
+            message: "Permintaan berhasil disetujui",
+          });
+        } catch (err) {
+          console.error("Error approve:", err);
+          const errorMessage = err instanceof Error ? err.message : "Gagal menyetujui permintaan";
+          setSuccessModal({
+            show: true,
+            message: errorMessage,
+          });
+        }
+      },
+    });
+  };
+
+  const handleReject = (judulId: string, mahasiswaId: string, mahasiswaName: string) => {
+    setConfirmModal({
+      show: true,
+      title: "Tolak Permintaan",
+      message: `Apakah Anda yakin ingin menolak permintaan dari ${mahasiswaName}?`,
+      confirmText: "Ya, Tolak",
+      onConfirm: async () => {
+        setConfirmModal(null);
+        try {
+          await fetchJson(`/api/judul/${judulId}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mahasiswaId }),
+          });
+          const data = await fetchJson(`/api/judul/requests?status=PENDING`);
+          setPendingList(data.data || []);
+          setSuccessModal({
+            show: true,
+            message: "Permintaan berhasil ditolak",
+          });
+        } catch (err) {
+          console.error("Error reject:", err);
+          const errorMessage = err instanceof Error ? err.message : "Gagal menolak permintaan";
+          setSuccessModal({
+            show: true,
+            message: errorMessage,
+          });
+        }
+      },
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; className: string }> = {
+      DIAMBIL: { label: "Diambil", className: "bg-orange-100 text-orange-800" },
+      Draft: { label: "Draft", className: "bg-gray-100 text-gray-800" },
+      DRAFT: { label: "Draft", className: "bg-gray-100 text-gray-800" },
+      Published: { label: "Published", className: "bg-blue-100 text-blue-800" },
+      PUBLISHED: { label: "Published", className: "bg-blue-100 text-blue-800" },
+      BELUM_DIAMBIL: { label: "Belum Diambil", className: "bg-blue-50 text-blue-700" },
+      SELESAI: { label: "Selesai", className: "bg-green-100 text-green-800" },
+    };
+    const mapped = statusMap[status] || { label: status, className: "bg-gray-100 text-gray-800" };
+    return (
+      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${mapped.className}`}>
+        {mapped.label}
+      </span>
+    );
+  };
+
+  const getActionIcons = (item: Judul) => {
+    if (item.status === "DIAMBIL" || item.status === "Diambil") {
+      return (
+        <>
+          <button 
+            onClick={() => handleDelete(item.id, item.judul)} 
+            className="text-red-600 hover:text-red-800"
+            title="Hapus judul"
+          >
+            <i className="bi bi-trash"></i>
+          </button>
+          <button onClick={() => handleOpenModal(item)} className="text-blue-600 hover:text-blue-800">
+            <i className="bi bi-pencil"></i>
+          </button>
+        </>
+      );
+    } else if (item.status === "DRAFT" || item.status === "Draft") {
+      return (
+        <>
+          <button 
+            onClick={() => handleConfirm(item.id)} 
+            className="text-blue-600 hover:text-blue-800"
+            title="Unggah (Ubah status menjadi Belum Diambil)"
+          >
+            <i className="bi bi-upload"></i>
+          </button>
+          <button 
+            onClick={() => handleDelete(item.id, item.judul)} 
+            className="text-red-600 hover:text-red-800"
+            title="Hapus judul"
+          >
+            <i className="bi bi-trash"></i>
+          </button>
+          <button onClick={() => handleOpenModal(item)} className="text-blue-600 hover:text-blue-800">
+            <i className="bi bi-pencil"></i>
+          </button>
+        </>
+      );
+    } else if (item.status === "PUBLISHED" || item.status === "Published") {
+      return (
+        <>
+          <button 
+            onClick={() => handleDelete(item.id, item.judul)} 
+            className="text-red-600 hover:text-red-800"
+            title="Hapus judul"
+          >
+            <i className="bi bi-trash"></i>
+          </button>
+          <button onClick={() => handleOpenModal(item)} className="text-blue-600 hover:text-blue-800">
+            <i className="bi bi-pencil"></i>
+          </button>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <button 
+            onClick={() => handleDelete(item.id, item.judul)} 
+            className="text-red-600 hover:text-red-800"
+            title="Hapus judul"
+          >
+            <i className="bi bi-trash"></i>
+          </button>
+          <button onClick={() => handleOpenModal(item)} className="text-blue-600 hover:text-blue-800">
+            <i className="bi bi-pencil"></i>
+          </button>
+        </>
+      );
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* Header */}
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
         <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          {/* Logo */}
           <div className="flex items-center">
             <div
               className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
@@ -20,8 +498,6 @@ export default function FormPengajuanJudulPage() {
             ></div>
             <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
           </div>
-
-          {/* Avatar */}
           <div className="flex items-center">
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -31,190 +507,495 @@ export default function FormPengajuanJudulPage() {
         </div>
       </div>
 
-      {/* Main Sidebar */}
       <div className="flex flex-1">
-        {/* Sidebar kiri */}
-        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-          {/* Main Sidebar */}
-          <div className="w-full h-[225px] mt-[30px] flex flex-col">
-            <Link href="/dosen/dashboard">
-              {/* Menu 1 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-house-door text-xl"></i>
-                <h1 className="font-medium">Beranda</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/tawaranjudul">
-              {/* Menu 2 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-people-fill text-xl"></i>
-                <h1 className="font-medium">Tawaran Judul</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/formpengajuanjudul">
-              {/* Menu 3 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-book text-xl"></i>
-                <h1 className="font-medium">Form Pengajuan Judul</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/monitoring">
-              {/* Menu 4 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-display text-xl"></i>
-                <h1 className="font-medium">Monitoring</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/panduandosen">
-              {/* Menu 5 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-file-earmark text-xl"></i>
-                <h1 className="font-medium">Panduan</h1>
-              </div>
-            </Link>
-          </div>
-          {/* Sub Sidebar */}
-          <div className="w-full h-[220px] flex flex-col">
-            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-              <i className="bi bi-gear text-xl"></i>
-              <h1 className="font-medium">Pengaturan</h1>
-            </div>
-            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
-              <Avatar>
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="font-medium">John Doe</h1>
-                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
-              </div>
-              <div className=" ml-8">
-                <i className="bi bi-box-arrow-left text-xl"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
+        <SidebarDosen />
         <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
-          {/* Path */}
-          <div className="flex justify-start w-full text-gray-400 gap-2">
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
-            <span>\</span>
-            <span>FORM PENGAJUAN JUDUL</span>
+            <span>&gt;</span>
+            <span>MANAJEMEN JUDUL</span>
           </div>
 
-          {/* Page Title */}
-          <h1 className="text-2xl font-bold text-black">
-            Form Pengajuan Judul
-          </h1>
+          <h1 className="text-2xl font-bold text-black">Manajemen Judul</h1>
 
-          {/* Form Card */}
-          <div className="w-full bg-white rounded-lg shadow-md p-8">
-            <button className="flex items-center gap-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-50 transition">
-              <i className="bi bi-arrow-left"></i>
-              Kembali
+          <div className="flex gap-6 border-b border-gray-300">
+            <button
+              onClick={() => setActiveTab("daftar")}
+              className={`pb-2 px-1 font-medium ${
+                activeTab === "daftar"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+              }`}
+            >
+              Daftar Judul
             </button>
+            <button
+              onClick={() => setActiveTab("mahasiswa")}
+              className={`pb-2 px-1 font-medium ${
+                activeTab === "mahasiswa"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+              }`}
+            >
+              Daftar Mahasiswa Bimbingan
+            </button>
+            <button
+              onClick={() => setActiveTab("pending")}
+              className={`pb-2 px-1 font-medium ${
+                activeTab === "pending"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+              }`}
+            >
+              Pending
+            </button>
+          </div>
 
-            <form className="mt-8 space-y-6">
-              <div>
-                <label
-                  htmlFor="judul"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+          {activeTab === "daftar" && (
+            <>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => handleOpenModal()}
+                  className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
                 >
+                  <i className="bi bi-plus-lg text-lg"></i>
+                  Ajukan Judul Baru
+                </button>
+              </div>
+
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Laboratorium</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {loading
+                      ? Array.from({ length: itemsPerPage }).map((_, idx) => (
+                          <tr key={idx}>
+                            {Array.from({ length: 6 }).map((_, colIdx) => (
+                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                              </td>
+                            ))}
+                          </tr>
+                        ))
+                      : paginatedList.length > 0
+                      ? paginatedList.map((item, index) => (
+                          <tr key={item.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {item.judul}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {item.deskripsi.length > 50
+                                ? item.deskripsi.slice(0, 50) + "..."
+                                : item.deskripsi}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {item.lab?.nama || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              {getStatusBadge(item.status)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              <div className="flex items-center gap-3">
+                                {getActionIcons(item)}
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      : (
+                        <tr>
+                          <td colSpan={6} className="text-center py-4 text-gray-500">
+                            Belum ada data
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="w-full flex justify-between items-center">
+                <span className="text-sm text-gray-700">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handlePrev}
+                    disabled={currentPage === 1}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={currentPage === totalPages}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === "mahasiswa" && (
+            <>
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Mahasiswa</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul Tugas Akhir</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progres Terakhir</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {mahasiswaLoading
+                      ? Array.from({ length: itemsPerPage }).map((_, idx) => (
+                          <tr key={idx}>
+                            {Array.from({ length: 5 }).map((_, colIdx) => (
+                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                              </td>
+                            ))}
+                          </tr>
+                        ))
+                      : mahasiswaList.length > 0
+                      ? mahasiswaList.map((mahasiswa, index) => {
+                          const judulAktif = mahasiswa.judul[0] || null;
+                          const progressTerakhir = judulAktif?.progressTerakhir;
+                          return (
+                            <tr key={mahasiswa.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {(mahasiswaPage - 1) * itemsPerPage + index + 1}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {mahasiswa.nama}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {mahasiswa.email}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {judulAktif ? judulAktif.judul : "-"}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {progressTerakhir ? (
+                                  <div>
+                                    <div className="font-medium">{progressTerakhir.tahap}</div>
+                                    <div className="text-xs text-gray-400 mt-1">
+                                      {new Date(progressTerakhir.createdAt).toLocaleDateString("id-ID")}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      : (
+                        <tr>
+                          <td colSpan={5} className="text-center py-4 text-gray-500">
+                            Belum ada data mahasiswa bimbingan
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="w-full flex justify-between items-center">
+                <span className="text-sm text-gray-700">
+                  Page {mahasiswaPage} of {mahasiswaTotalPages}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setMahasiswaPage((prev) => (prev > 1 ? prev - 1 : prev))}
+                    disabled={mahasiswaPage === 1}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      mahasiswaPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setMahasiswaPage((prev) => (prev < mahasiswaTotalPages ? prev + 1 : prev))}
+                    disabled={mahasiswaPage === mahasiswaTotalPages}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      mahasiswaPage === mahasiswaTotalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === "pending" && (
+            <>
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Mahasiswa</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul Tugas Akhir</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {pendingLoading
+                      ? Array.from({ length: itemsPerPage }).map((_, idx) => (
+                          <tr key={idx}>
+                            {Array.from({ length: 5 }).map((_, colIdx) => (
+                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                              </td>
+                            ))}
+                          </tr>
+                        ))
+                      : pendingList.length > 0
+                      ? pendingList
+                          .slice(
+                            (pendingPage - 1) * itemsPerPage,
+                            pendingPage * itemsPerPage
+                          )
+                          .map((request, index) => (
+                            <tr key={request.id}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {(pendingPage - 1) * itemsPerPage + index + 1}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {request.mahasiswa.nama}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {request.mahasiswa.email}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {request.judul.judul}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() =>
+                                      handleApprove(
+                                        request.judulId,
+                                        request.mahasiswaId,
+                                        request.mahasiswa.nama
+                                      )
+                                    }
+                                    className="bg-blue-600 text-white font-semibold py-1.5 px-4 rounded-lg text-sm hover:bg-blue-700 transition"
+                                  >
+                                    Setujui
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleReject(
+                                        request.judulId,
+                                        request.mahasiswaId,
+                                        request.mahasiswa.nama
+                                      )
+                                    }
+                                    className="bg-red-600 text-white font-semibold py-1.5 px-4 rounded-lg text-sm hover:bg-red-700 transition"
+                                  >
+                                    Tolak
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                      : (
+                        <tr>
+                          <td colSpan={5} className="text-center py-4 text-gray-500">
+                            Belum ada permintaan pending
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="w-full flex justify-between items-center">
+                <span className="text-sm text-gray-700">
+                  Page {pendingPage} of {pendingTotalPages}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPendingPage((prev) => (prev > 1 ? prev - 1 : prev))}
+                    disabled={pendingPage === 1}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      pendingPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPendingPage((prev) => (prev < pendingTotalPages ? prev + 1 : prev))}
+                    disabled={pendingPage === pendingTotalPages}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                      pendingPage === pendingTotalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6">
+            <h2 className="text-2xl font-bold text-black mb-6">
+              {editingJudul ? "Edit Judul" : "Form Pengajuan Judul"}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="judul" className="block text-sm font-medium text-gray-700 mb-1">
                   Judul
                 </label>
                 <input
                   type="text"
                   id="judul"
+                  value={formData.judul}
+                  onChange={(e) => setFormData({ ...formData, judul: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3"
-                  placeholder=""
+                  required
+                  minLength={5}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="deskripsi"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="deskripsi" className="block text-sm font-medium text-gray-700 mb-1">
                   Deskripsi
                 </label>
                 <textarea
                   id="deskripsi"
+                  value={formData.deskripsi}
+                  onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
                   rows={4}
                   className="w-full border border-gray-300 rounded-lg p-3"
-                  placeholder=""
-                ></textarea>
+                  required
+                  minLength={30}
+                />
               </div>
-
               <div>
-                <label
-                  htmlFor="laboratorium"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+                <label htmlFor="labId" className="block text-sm font-medium text-gray-700 mb-1">
                   Laboratorium
                 </label>
-                <input
-                  type="text"
-                  id="laboratorium"
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                  placeholder=""
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="kuota"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Kuota Mahasiswa
-                </label>
-                <input
-                  type="number"
-                  id="kuota"
-                  className="w-full border border-gray-300 rounded-lg p-3"
-                  placeholder=""
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Status
-                </label>
                 <select
-                  id="status"
+                  id="labId"
+                  value={formData.labId}
+                  onChange={(e) => setFormData({ ...formData, labId: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg p-3 bg-white"
+                  required
                 >
-                  <option disabled selected>
-                    Pilih Status
-                  </option>
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
+                  <option value="">Pilih Laboratorium</option>
+                  {labs.map((lab) => (
+                    <option key={lab.id} value={lab.id}>
+                      {lab.nama}
+                    </option>
+                  ))}
                 </select>
               </div>
-
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="bg-red-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-red-700 transition"
+                >
+                  Batal
+                </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition"
+                  disabled={submitting}
+                  className="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                 >
-                  Ajukan
+                  {editingJudul ? "Simpan" : "Ajukan"}
                 </button>
               </div>
             </form>
           </div>
         </div>
-      </div>
+      )}
+
+      {confirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setConfirmModal(null)}>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative mb-4">
+                <div className="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
+                    <svg className="w-8 h-8 text-yellow-800" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-xl font-bold text-gray-800 mb-2">{confirmModal.title}</h2>
+              <p className="text-gray-600 text-center text-sm">{confirmModal.message}</p>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setConfirmModal(null)}
+                className="flex-1 bg-white border border-gray-300 text-gray-700 font-semibold py-2.5 px-4 rounded-lg hover:bg-gray-50 transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={confirmModal.onConfirm}
+                className="flex-1 bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-red-700 transition"
+              >
+                {confirmModal.confirmText || "Ya, Konfirmasi"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {successModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <div className="flex flex-col items-center mb-4">
+              <div className="relative mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                    <i className="bi bi-check-circle-fill text-white text-2xl"></i>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 text-center">{successModal.message}</p>
+            </div>
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={() => setSuccessModal(null)}
+                className="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

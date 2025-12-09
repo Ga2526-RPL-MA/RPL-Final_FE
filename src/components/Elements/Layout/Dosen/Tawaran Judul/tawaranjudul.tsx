@@ -1,18 +1,71 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+"use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
+import { fetchJson } from "@/lib/api";
+import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
+
+interface Judul {
+  id: string;
+  judul: string;
+  deskripsi: string;
+  dosen?: { nama: string };
+  lab?: { nama: string };
+  status: string;
+}
 
 export default function TawaranJudulPage() {
+  const router = useRouter();
+  const [judulList, setJudulList] = useState<Judul[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchJudul = async () => {
+      try {
+        const data = await fetchJson("/api/judul");
+        setJudulList(data.data || data);
+      } catch (err) {
+        console.error("Error fetch judul:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJudul();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const filteredJudulList = judulList.filter(
+    (item) =>
+      item.judul.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.dosen?.nama?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredJudulList.length / itemsPerPage);
+
+  const paginatedList = filteredJudulList.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleNext = () => {
+    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : 1));
+  };
+
+  const handlePrev = () => {
+    setCurrentPage((prev) => (prev > 1 ? prev - 1 : totalPages));
+  };
+
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* Header */}
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
         <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          {/* Logo */}
           <div className="flex items-center">
             <div
               className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
@@ -20,8 +73,6 @@ export default function TawaranJudulPage() {
             ></div>
             <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
           </div>
-
-          {/* Avatar */}
           <div className="flex items-center">
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -31,79 +82,9 @@ export default function TawaranJudulPage() {
         </div>
       </div>
 
-      {/* Main Sidebar */}
       <div className="flex flex-1">
-        {/* Sidebar kiri */}
-        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-          {/* Main Sidebar */}
-          <div className="w-full h-[225px] mt-[30px] flex flex-col">
-            <Link href="/dosen/dashboard">
-              {/* Menu 1 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-house-door text-xl"></i>
-                <h1 className="font-medium">Beranda</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/tawaranjudul">
-              {/* Menu 2 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-people-fill text-xl"></i>
-                <h1 className="font-medium">Tawaran Judul</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/formpengajuanjudul">
-              {/* Menu 3 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-book text-xl"></i>
-                <h1 className="font-medium">Form Pengajuan Judul</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/monitoring">
-              {/* Menu 4 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-display text-xl"></i>
-                <h1 className="font-medium">Monitoring</h1>
-              </div>
-            </Link>
-
-            <Link href="/dosen/dashboard/panduandosen">
-              {/* Menu 5 */}
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-file-earmark text-xl"></i>
-                <h1 className="font-medium">Panduan</h1>
-              </div>
-            </Link>
-          </div>
-          {/* Sub Sidebar */}
-          <div className="w-full h-[220px] flex flex-col">
-            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-              <i className="bi bi-gear text-xl"></i>
-              <h1 className="font-medium">Pengaturan</h1>
-            </div>
-            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
-              <Avatar>
-                <AvatarImage
-                  src="https://github.com/shadcn.png"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="font-medium">John Doe</h1>
-                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
-              </div>
-              <div className=" ml-8">
-                <i className="bi bi-box-arrow-left text-xl"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+        <SidebarDosen />
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
           {/* Path */}
           <div className="flex justify-start w-full text-gray-400 gap-2">
             <span>BERANDA</span>
@@ -111,166 +92,120 @@ export default function TawaranJudulPage() {
             <span>TAWARAN JUDUL</span>
           </div>
 
-          {/* Page Header */}
+          {/* Header + Search */}
           <div className="w-full flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-black">
-              Tawaran Judul
-            </h1>
-            <button className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
-              <i className="bi bi-plus-lg text-lg"></i>
-              Pengajuan Judul
-            </button>
+            <h1 className="w-full text-2xl font-semibold text-black">Tawaran Judul</h1>
+            <input
+              type="text"
+              placeholder="Cari judul atau dosen..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
           </div>
 
-          {/* Table Container */}
+          {/* Table */}
           <div className="w-full bg-white rounded-lg shadow-md overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    No
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Judul
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Deskripsi
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Dosen Pembimbing
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Laboratorium
-                  </th>
-
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Status
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosen Pembimbing</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Laboratorium</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {/* Dummy Row 1 */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    1
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Judul
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Deskripsi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Dosen Pembimbing
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Lab
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                      Diambil
-                    </span>
-                  </td>
-                </tr>
-                {/* Dummy Row 2 */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    1
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Judul
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Deskripsi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Dosen Pembimbing
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Lab
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                      Draft
-                    </span>
-                  </td>
-                </tr>
-                {/* Dummy Row 3 */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    1
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Judul
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Deskripsi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Dosen Pembimbing
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Lab
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      Published
-                    </span>
-                  </td>
-                </tr>
-                {/* Dummy Row 4 */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    1
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    Judul
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Deskripsi
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Dosen Pembimbing
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    Lab
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Selesai
-                    </span>
-                  </td>
-                </tr>
+                {loading
+                  ? Array.from({ length: itemsPerPage }).map((_, idx) => (
+                      <tr key={idx}>
+                        {Array.from({ length: 6 }).map((_, colIdx) => (
+                          <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  : paginatedList.length > 0
+                  ? paginatedList.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        onClick={() =>
+                          router.push(
+                            `/dosen/dashboard/tawaranjudul/detail/${item.id}`
+                          )
+                        }
+                        className="cursor-pointer hover:bg-gray-100 transition"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {item.judul}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.deskripsi.length > 30
+                            ? item.deskripsi.slice(0, 30) + "..."
+                            : item.deskripsi}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.dosen?.nama || "-"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {item.lab?.nama || "-"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span
+                            className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              item.status === "DIAMBIL" || item.status === "Diambil"
+                                ? "bg-red-100 text-red-800"
+                                : item.status === "DRAFT" || item.status === "Draft"
+                                ? "bg-gray-100 text-gray-800"
+                                : item.status === "PUBLISHED" || item.status === "Published"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  : (
+                    <tr>
+                      <td colSpan={6} className="text-center py-4 text-gray-500">
+                        Belum ada data
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
           <div className="w-full flex justify-between items-center mt-4">
-            <span className="text-sm text-gray-700">Page 1 of 10</span>
+            <span className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </span>
             <div className="flex gap-2">
-              <button className="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50">
+              <button
+                onClick={handlePrev}
+                disabled={totalPages === 1}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                  totalPages === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
                 Previous
               </button>
-              <button className="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50">
+              <button
+                onClick={handleNext}
+                disabled={totalPages === 1}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
+                  totalPages === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
                 Next
               </button>
             </div>
