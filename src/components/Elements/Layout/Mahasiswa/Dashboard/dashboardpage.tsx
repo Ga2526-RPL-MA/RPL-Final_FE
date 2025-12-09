@@ -45,6 +45,8 @@ export default function MahasiswaDashboardPage() {
   const [judulList, setJudulList] = useState<Judul[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selected, setSelected] = useState<Date[]>([]);
+  const [namaKegiatan, setNamaKegiatan] = useState("");
 
   const filteredJudulList = judulList.filter(
     (item) =>
