@@ -153,10 +153,10 @@ export default function ProgressTugasAkhir() {
         <div className="bg-slate-200 flex-1 min-h-screen flex flex-col items-center gap-6 p-6 overflow-y-auto">
 
           {/* PATH */}
-          <div className="flex justify-start w-full text-gray-400 gap-2">
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
-            <span>\</span>
-            <span>PROGRESS TUGAS AKHIR</span>
+            <span>&gt;</span>
+            <span>PROGRES TUGAS AKHIR</span>
           </div>
 
           <h1 className="w-full text-2xl font-semibold text-black">Progres Tugas Akhir</h1>

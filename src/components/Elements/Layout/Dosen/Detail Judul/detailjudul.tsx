@@ -62,10 +62,10 @@ export default function DetailJudulDosen() {
     data.status === "BELUM_DIAMBIL"
       ? "Tersedia"
       : data.status === "DIAMBIL"
-      ? "Sudah Diambil"
-      : data.status === "PUBLISHED"
-      ? "Dipublish"
-      : data.status;
+        ? "Sudah Diambil"
+        : data.status === "PUBLISHED"
+          ? "Dipublish"
+          : data.status;
 
   const isAvailable = data.status === "BELUM_DIAMBIL";
 
@@ -91,13 +91,13 @@ export default function DetailJudulDosen() {
 
       <div className="flex flex-1 bg-[#f4f6fb]">
         <SidebarDosen />
-        <div className="flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
           <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
-            <span>\</span>
+            <span>&gt;</span>
             <span>TAWARAN JUDUL</span>
-            <span>\</span>
-            <span>DETAIL</span>
+            <span>&gt;</span>
+            <span>DETAIL JUDUL</span>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">

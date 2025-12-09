@@ -216,11 +216,11 @@ export default function DetailTugasAkhir() {
 
         {/* Main Content */}
         <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
-          <div className="flex justify-start w-full text-gray-400 gap-2">
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
-            <span>\</span>
-            <span>TAWARAN JUDUL TUGAS AKHIR</span>
-            <span>\</span>
+            <span>&gt;</span>
+            <span>TAWARAN JUDUL TUGAS</span>
+            <span>&gt;</span>
             <span>DETAIL TUGAS AKHIR</span>
           </div>
 
