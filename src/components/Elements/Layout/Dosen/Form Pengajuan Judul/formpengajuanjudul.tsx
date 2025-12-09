@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetchJson } from "@/lib/api";
 import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
+import { useSearchParams } from "next/navigation";
 
 interface Judul {
   id: string;
@@ -71,10 +72,18 @@ interface PendingRequest {
 }
 
 export default function FormPengajuanJudulPage() {
+  const searchParams = useSearchParams();
   const [judulList, setJudulList] = useState<Judul[]>([]);
   const [filteredJudulList, setFilteredJudulList] = useState<Judul[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("daftar");
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "pending" || tab === "mahasiswa" || tab === "daftar") {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingJudul, setEditingJudul] = useState<Judul | null>(null);
@@ -105,6 +114,11 @@ export default function FormPengajuanJudulPage() {
   const [pendingLoading, setPendingLoading] = useState(false);
   const [pendingPage, setPendingPage] = useState(1);
   const [pendingTotalPages, setPendingTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterLab, setFilterLab] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [filterProgress, setFilterProgress] = useState<string>("");
+  const [showFilter, setShowFilter] = useState(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -133,21 +147,99 @@ export default function FormPengajuanJudulPage() {
   }, []);
 
   useEffect(() => {
+    if (activeTab === "daftar") {
+      setCurrentPage(1);
+    }
+    if (activeTab === "mahasiswa") {
+      setMahasiswaPage(1);
+    }
+    if (activeTab === "pending") {
+      setPendingPage(1);
+    }
+  }, [filterLab, filterStatus, filterProgress, searchQuery, activeTab]);
+
+  useEffect(() => {
     if (profile && judulList.length > 0) {
-      const filtered = judulList.filter((judul) => judul.dosenId === profile.id);
+      let filtered = judulList.filter((judul) => judul.dosenId === profile.id);
+      
+      // Filter by lab
+      if (filterLab) {
+        filtered = filtered.filter((judul) => judul.labId === filterLab || judul.lab?.id === filterLab);
+      }
+      
+      // Filter by status
+      if (filterStatus) {
+        filtered = filtered.filter((judul) => judul.status === filterStatus);
+      }
+      
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(
+          (judul) =>
+            judul.judul.toLowerCase().includes(query) ||
+            judul.deskripsi.toLowerCase().includes(query) ||
+            judul.lab?.nama.toLowerCase().includes(query)
+        );
+      }
+      
       setFilteredJudulList(filtered);
     }
-  }, [profile, judulList]);
+  }, [profile, judulList, filterLab, filterStatus, searchQuery]);
 
   useEffect(() => {
     if (activeTab === "mahasiswa") {
       setMahasiswaPage(1);
+      setFilterProgress("");
+      setSearchQuery("");
     } else if (activeTab === "daftar") {
       setCurrentPage(1);
+      setFilterLab("");
+      setFilterStatus("");
+      setSearchQuery("");
     } else if (activeTab === "pending") {
       setPendingPage(1);
+      setSearchQuery("");
     }
+    setShowFilter(false);
   }, [activeTab]);
+
+  const [filteredMahasiswaList, setFilteredMahasiswaList] = useState<MahasiswaBimbingan[]>([]);
+  const [filteredPendingList, setFilteredPendingList] = useState<PendingRequest[]>([]);
+
+  useEffect(() => {
+    if (activeTab === "mahasiswa") {
+      if (mahasiswaList.length > 0) {
+        let filtered = [...mahasiswaList];
+        
+        // Filter by progress
+        if (filterProgress) {
+          filtered = filtered.filter((mahasiswa) => {
+            const judulAktif = mahasiswa.judul[0];
+            if (!judulAktif?.progressTerakhir) return filterProgress === "no-progress";
+            return judulAktif.progressTerakhir.tahap === filterProgress;
+          });
+        }
+        
+        // Filter by search query
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          filtered = filtered.filter(
+            (mahasiswa) =>
+              mahasiswa.nama.toLowerCase().includes(query) ||
+              mahasiswa.email.toLowerCase().includes(query) ||
+              mahasiswa.judul.some((j) => j.judul.toLowerCase().includes(query))
+          );
+        }
+        
+        setFilteredMahasiswaList(filtered);
+        setMahasiswaTotalPages(Math.ceil(filtered.length / itemsPerPage));
+      } else {
+        setFilteredMahasiswaList([]);
+        setMahasiswaTotalPages(1);
+      }
+    }
+  }, [mahasiswaList, filterProgress, searchQuery, activeTab]);
 
   useEffect(() => {
     if (activeTab === "mahasiswa") {
@@ -172,7 +264,6 @@ export default function FormPengajuanJudulPage() {
           const data = await fetchJson(`/api/judul/requests?status=PENDING`);
           const requests = data.data || [];
           setPendingList(requests);
-          setPendingTotalPages(Math.ceil(requests.length / itemsPerPage));
         } catch (err) {
           console.error("Error fetch pending:", err);
           setPendingList([]);
@@ -183,6 +274,48 @@ export default function FormPengajuanJudulPage() {
       fetchPending();
     }
   }, [activeTab, mahasiswaPage]);
+
+  useEffect(() => {
+    if (activeTab === "pending") {
+      setPendingPage(1);
+      if (pendingList.length > 0) {
+        let filtered = [...pendingList];
+        
+        // Filter by search query
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          filtered = filtered.filter(
+            (request) =>
+              request.mahasiswa.nama.toLowerCase().includes(query) ||
+              request.mahasiswa.email.toLowerCase().includes(query) ||
+              request.judul.judul.toLowerCase().includes(query)
+          );
+        }
+        
+        setFilteredPendingList(filtered);
+        setPendingTotalPages(Math.ceil(filtered.length / itemsPerPage));
+      } else {
+        setFilteredPendingList([]);
+        setPendingTotalPages(1);
+      }
+    }
+  }, [pendingList, searchQuery, activeTab]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showFilter && !target.closest(".filter-dropdown")) {
+        setShowFilter(false);
+      }
+    };
+
+    if (showFilter) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showFilter]);
 
   const totalPages = Math.ceil(filteredJudulList.length / itemsPerPage);
   const paginatedList = filteredJudulList.slice(
@@ -562,6 +695,82 @@ export default function FormPengajuanJudulPage() {
 
           {activeTab === "daftar" && (
             <>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    placeholder="Cari judul, deskripsi, atau laboratorium..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div className="relative filter-dropdown">
+                  <button
+                    onClick={() => setShowFilter(!showFilter)}
+                    className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-gray-50 transition"
+                  >
+                    <i className="bi bi-funnel"></i>
+                    Filter
+                    {(filterLab || filterStatus) && (
+                      <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                    )}
+                  </button>
+                  {showFilter && (
+                    <div 
+                      className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 filter-dropdown"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Laboratorium
+                          </label>
+                          <select
+                            value={filterLab}
+                            onChange={(e) => setFilterLab(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                          >
+                            <option value="">Semua Lab</option>
+                            {labs.map((lab) => (
+                              <option key={lab.id} value={lab.id}>
+                                {lab.nama}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Status
+                          </label>
+                          <select
+                            value={filterStatus}
+                            onChange={(e) => setFilterStatus(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                          >
+                            <option value="">Semua Status</option>
+                            <option value="DRAFT">Draft</option>
+                            <option value="BELUM_DIAMBIL">Belum Diambil</option>
+                            <option value="DIAMBIL">Diambil</option>
+                            <option value="SELESAI">Selesai</option>
+                            <option value="PUBLISHED">Published</option>
+                          </select>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setFilterLab("");
+                            setFilterStatus("");
+                          }}
+                          className="w-full bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition text-sm"
+                        >
+                          Reset Filter
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -654,6 +863,68 @@ export default function FormPengajuanJudulPage() {
 
           {activeTab === "mahasiswa" && (
             <>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    placeholder="Cari nama mahasiswa, email, atau judul..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div className="relative filter-dropdown">
+                  <button
+                    onClick={() => setShowFilter(!showFilter)}
+                    className="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-gray-50 transition"
+                  >
+                    <i className="bi bi-funnel"></i>
+                    Filter
+                    {filterProgress && (
+                      <span className="w-2 h-2 bg-blue-600 rounded-full"></span>
+                    )}
+                  </button>
+                  {showFilter && (
+                    <div 
+                      className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 filter-dropdown"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Progress
+                          </label>
+                          <select
+                            value={filterProgress}
+                            onChange={(e) => setFilterProgress(e.target.value)}
+                            className="w-full border border-gray-300 rounded-lg p-2 text-sm"
+                          >
+                            <option value="">Semua Progress</option>
+                            <option value="no-progress">Belum Ada Progress</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Bab 1">Bab 1</option>
+                            <option value="Bab 2">Bab 2</option>
+                            <option value="Bab 3">Bab 3</option>
+                            <option value="Bab 4">Bab 4</option>
+                            <option value="Bab 5">Bab 5</option>
+                            <option value="Selesai">Selesai</option>
+                          </select>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setFilterProgress("");
+                          }}
+                          className="w-full bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-200 transition text-sm"
+                        >
+                          Reset Filter
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -676,15 +947,20 @@ export default function FormPengajuanJudulPage() {
                             ))}
                           </tr>
                         ))
-                      : mahasiswaList.length > 0
-                      ? mahasiswaList.map((mahasiswa, index) => {
-                          const judulAktif = mahasiswa.judul[0] || null;
-                          const progressTerakhir = judulAktif?.progressTerakhir;
-                          return (
-                            <tr key={mahasiswa.id}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {(mahasiswaPage - 1) * itemsPerPage + index + 1}
-                              </td>
+                      : filteredMahasiswaList.length > 0
+                      ? filteredMahasiswaList
+                          .slice(
+                            (mahasiswaPage - 1) * itemsPerPage,
+                            mahasiswaPage * itemsPerPage
+                          )
+                          .map((mahasiswa, index) => {
+                            const judulAktif = mahasiswa.judul[0] || null;
+                            const progressTerakhir = judulAktif?.progressTerakhir;
+                            return (
+                              <tr key={mahasiswa.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {(mahasiswaPage - 1) * itemsPerPage + index + 1}
+                                </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {mahasiswa.nama}
                               </td>
@@ -750,6 +1026,19 @@ export default function FormPengajuanJudulPage() {
 
           {activeTab === "pending" && (
             <>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    placeholder="Cari nama mahasiswa, email, atau judul..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+              </div>
+
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -772,8 +1061,8 @@ export default function FormPengajuanJudulPage() {
                             ))}
                           </tr>
                         ))
-                      : pendingList.length > 0
-                      ? pendingList
+                      : filteredPendingList.length > 0
+                      ? filteredPendingList
                           .slice(
                             (pendingPage - 1) * itemsPerPage,
                             pendingPage * itemsPerPage
@@ -864,7 +1153,7 @@ export default function FormPengajuanJudulPage() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6">
             <h2 className="text-2xl font-bold text-black mb-6">
               {editingJudul ? "Edit Judul" : "Form Pengajuan Judul"}
@@ -939,7 +1228,7 @@ export default function FormPengajuanJudulPage() {
       )}
 
       {confirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setConfirmModal(null)}>
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setConfirmModal(null)}>
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col items-center mb-6">
               <div className="relative mb-4">
@@ -973,7 +1262,7 @@ export default function FormPengajuanJudulPage() {
       )}
 
       {successModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
             <div className="flex flex-col items-center mb-4">
               <div className="relative mb-4">

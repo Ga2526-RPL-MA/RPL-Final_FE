@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetchJson } from "@/lib/api";
 import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
+import Link from "next/link";
 
 export default function DosenDashboardPage() {
   const [profileName, setProfileName] = useState<string>("");
   const [profileEmail, setProfileEmail] = useState<string>("");
+  const [pendingCount, setPendingCount] = useState<number>(0);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -26,6 +28,20 @@ export default function DosenDashboardPage() {
       }
     }
     fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    async function fetchPendingCount() {
+      try {
+        const data = await fetchJson("/api/judul/requests?status=PENDING");
+        const requests = data.data || [];
+        setPendingCount(requests.length);
+      } catch (err) {
+        console.error("Error fetch pending count:", err);
+        setPendingCount(0);
+      }
+    }
+    fetchPendingCount();
   }, []);
 
   return (
@@ -67,7 +83,10 @@ export default function DosenDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3">
+            <Link 
+              href="/dosen/dashboard/manajemen-judul"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
+            >
               <div className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center text-blue-600">
                 <i className="bi bi-laptop"></i>
               </div>
@@ -75,17 +94,25 @@ export default function DosenDashboardPage() {
                 <h3 className="text-sm font-semibold text-gray-900">Pengajuan Judul</h3>
                 <p className="text-sm text-gray-600">Ajukan judul tugas akhir Anda.</p>
               </div>
-            </div>
+            </Link>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3">
-              <div className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center text-blue-600">
+            <Link 
+              href="/dosen/dashboard/manajemen-judul?tab=pending"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer relative"
+            >
+              <div className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center text-blue-600 relative">
                 <i className="bi bi-clock"></i>
+                {pendingCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                )}
               </div>
-              <div className="flex flex-col">
-                <h3 className="text-sm font-semibold text-gray-900">Pending Request</h3>
+              <div className="flex flex-col flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-gray-900">Pending Request</h3>
+                </div>
                 <p className="text-sm text-gray-600">Lihat pending request.</p>
               </div>
-            </div>
+            </Link>
 
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm text-white p-4 flex items-center justify-between">
               <div className="flex flex-col">
