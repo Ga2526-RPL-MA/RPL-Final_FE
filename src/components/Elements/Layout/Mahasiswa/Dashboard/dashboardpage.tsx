@@ -40,6 +40,8 @@ interface Judul {
 
 export default function MahasiswaDashboardPage() {
   const router = useRouter();
+  const [profileName, setProfileName] = useState<string>("");
+  const [profileEmail, setProfileEmail] = useState<string>("");
   const [judulList, setJudulList] = useState<Judul[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,6 +66,26 @@ export default function MahasiswaDashboardPage() {
     }
 
     fetchJudul();
+  }, []);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const token = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("access_token="))
+          ?.split("=")[1];
+        if (!token) return;
+        const me = await fetchJson("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfileName(me.profile?.nama || me.user?.email || "");
+        setProfileEmail(me.profile?.email || me.user?.email || "");
+      } catch (err) {
+        console.error("Error fetch profile:", err);
+      }
+    }
+    fetchProfile();
   }, []);
 
   return (
@@ -133,12 +155,12 @@ export default function MahasiswaDashboardPage() {
             </div>
             <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+                <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="font-medium">John Doe</h1>
-                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
+                <h1 className="font-medium">{profileName || "Pengguna"}</h1>
+                <h1 className="font-small text-gray-500">{profileEmail || ""}</h1>
               </div>
               <div className=" ml-8">
                 <i className="bi bi-box-arrow-left text-xl"></i>
@@ -156,13 +178,13 @@ export default function MahasiswaDashboardPage() {
           <div className="bg-white w-[1280px] h-[219px] rounded-lg shadow-md border border-gray-400">
             <div className="flex items-center justify-center h-full gap-6 mr-120">
               <Avatar className="w-40 h-40">
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+                <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col items-start">
                 <h1 className="text-black text-3xl font-bold">
-                  Selamat Datang, Jhon Doe
+                  {profileName ? `Selamat Datang, ${profileName}` : "Selamat Datang"}
                 </h1>
                 <h2 className="text-gray-700 text-lg font-medium mt-1">
                   Mahasiswa
