@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect, useState, useCallback } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { fetchJson } from "@/lib/api";
-import { useCallback } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface Dosen {
   nama: string;
@@ -48,10 +48,9 @@ export default function DetailTugasAkhir() {
       if (!token) throw new Error("Token tidak ditemukan. Silakan login ulang.");
 
       const result = await fetchJson(`/api/judul/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       if (!result.data) throw new Error("Judul tidak ditemukan.");
       setData(result.data);
     } catch (err: unknown) {
@@ -67,69 +66,199 @@ export default function DetailTugasAkhir() {
     fetchDetail();
   }, [fetchDetail]);
 
-  if (loading) return <p className="p-4">Loading...</p>;
-  if (errorMsg) return <p className="p-4 text-red-500">Error: {errorMsg}</p>;
-  if (!data) return <p className="p-4">Data tidak ditemukan.</p>;
+  const handleAmbilJudul = async () => {
+    try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("access_token="))
+        ?.split("=")[1];
+
+      if (!token) {
+        alert("Token tidak ditemukan. Silakan login ulang.");
+        return;
+      }
+
+      await fetchJson(`/api/judul/${id}/request`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      alert("Judul berhasil diambil!");
+      fetchDetail();
+    } catch (err: any) {
+      alert("Gagal mengambil judul: " + (err?.message || "Terjadi kesalahan."));
+    }
+  };
 
   const statusLabel =
-    data.status === "BELUM_DIAMBIL"
+    data?.status === "BELUM_DIAMBIL"
       ? "Tersedia"
-      : data.status === "DIAMBIL"
+      : data?.status === "DIAMBIL"
       ? "Sudah Diambil"
-      : data.status === "PUBLISHED"
-      ? "Dipublish"
-      : data.status;
+      : data?.status === "PUBLISHED"
+      ? "Published"
+      : data?.status;
 
-  const isAvailable = data.status === "BELUM_DIAMBIL";
+  const isAvailable = data?.status === "BELUM_DIAMBIL";
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">{data.judul}</h1>
+    <div className="bg-white min-h-screen flex flex-col">
+      {/* Header */}
+      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
+        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
+          <div className="flex items-center">
+            <div
+              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
+              style={{ backgroundImage: "url('/logo.png')" }}
+            ></div>
+            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
+          </div>
+          <div className="flex items-center">
+            <Avatar>
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+      </div>
 
-      <div className="p-4 border rounded-lg shadow-sm bg-white space-y-4">
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="https://ui-avatars.com/api/?name=DSN" />
-            <AvatarFallback>DSN</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm text-gray-500">Dosen</p>
-            <p className="font-medium">{data.dosen?.nama ?? "Tidak ada data"}</p>
+      {/* Sidebar + Main */}
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
+          <div className="w-full h-[180px] mt-[30px] flex flex-col">
+            <Link href="/mahasiswa/dashboard">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-house-door text-xl"></i>
+                <h1 className="font-medium">Beranda</h1>
+              </div>
+            </Link>
+            <Link href="/mahasiswa/dashboard/tawarantugasakhir">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-people-fill text-xl"></i>
+                <h1 className="font-medium">Tawaran Judul Tugas Akhir</h1>
+              </div>
+            </Link>
+            <Link href="/mahasiswa/dashboard/progresstugasakhir">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-book text-xl"></i>
+                <h1 className="font-medium">Progress Tugas Akhir</h1>
+              </div>
+            </Link>
+            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
+              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+                <i className="bi bi-file-earmark text-xl"></i>
+                <h1 className="font-medium">Panduan</h1>
+              </div>
+            </Link>
+          </div>
+
+          <div className="w-full h-[220px] flex flex-col">
+            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
+              <i className="bi bi-gear text-xl"></i>
+              <h1 className="font-medium">Pengaturan</h1>
+            </div>
+            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              <div>
+                <h1 className="font-medium">John Doe</h1>
+                <h1 className="text-gray-500 text-sm">johndoe@gmail.com</h1>
+              </div>
+              <div className="ml-8">
+                <i className="bi bi-box-arrow-left text-xl"></i>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div>
-          <p className="text-sm text-gray-500">Laboratorium</p>
-          <p className="font-medium">{data.lab?.nama ?? "Tidak ada data"}</p>
-        </div>
+        {/* Main Content */}
+        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
+          <div className="flex justify-start w-full text-gray-400 gap-2">
+            <span>BERANDA</span>
+            <span>\</span>
+            <span>TAWARAN JUDUL TUGAS AKHIR</span>
+            <span>\</span>
+            <span>DETAIL TUGAS AKHIR</span>
+          </div>
 
-        <div>
-          <p className="text-sm text-gray-500">Status</p>
-          <span
-            className={`px-3 py-1 rounded-full text-sm ${
-              isAvailable ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-            }`}
-          >
-            {statusLabel}
-          </span>
-        </div>
+          <div className="w-full flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-black">Detail Tugas Akhir</h1>
+          </div>
 
-        <div>
-          <p className="text-sm text-gray-500">Tanggal Upload</p>
-          <p className="font-medium">
-            {new Date(data.createdAt).toLocaleDateString("id-ID")}
-          </p>
+          {loading ? (
+            <p>Loading...</p>
+          ) : errorMsg ? (
+            <p className="text-red-500">{errorMsg}</p>
+          ) : data ? (
+            <div className="w-full bg-white border border-gray-300 rounded-xl p-6">
+              {/* Judul + Status */}
+              <div className="border border-dotted border-gray-400 p-4 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <h1 className="text-2xl font-semibold text-black">{data.judul}</h1>
+                  <span
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                      data.status === "PUBLISHED"
+                        ? "bg-blue-100 text-blue-800"
+                        : data.status === "DIAMBIL"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {statusLabel}
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-500 mt-2">
+                  Dibuat pada: {new Date(data.createdAt).toLocaleDateString("id-ID")}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Dibuat oleh: {data.dosen?.nama ?? "-"}
+                </p>
+              </div>
+
+              <div className="w-full h-[1px] bg-gray-400 my-4"></div>
+
+              {/* Informasi */}
+              <h1 className="text-2xl font-semibold text-black mb-2">Informasi</h1>
+              <div className="border border-dotted border-gray-400 p-4 rounded-lg">
+                <div className="mb-3">
+                  <p className="text-sm text-gray-500">Judul</p>
+                  <p className="text-black">{data.judul}</p>
+                </div>
+
+                <div className="mb-3">
+                  <p className="text-sm text-gray-500">Deskripsi</p>
+                  <p className="text-black text-justify">{data.deskripsi}</p>
+                </div>
+
+                <div className="mb-3">
+                  <p className="text-sm text-gray-500">Laboratorium</p>
+                  <p className="text-black">{data.lab?.nama ?? "-"}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-500">Dosen Pembimbing</p>
+                  <p className="text-black">{data.dosen?.nama ?? "-"}</p>
+                </div>
+              </div>
+
+              <div className="w-full h-[1px] bg-gray-400 my-4"></div>
+
+              {/* Tombol */}
+              <div className="flex justify-end">
+                <Button disabled={!isAvailable} onClick={handleAmbilJudul}>
+                  Ambil Judul
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p>Data tidak ditemukan</p>
+          )}
         </div>
       </div>
-
-      <div className="p-4 border rounded-lg shadow-sm bg-white">
-        <h2 className="text-lg font-semibold">Deskripsi</h2>
-        <p className="text-gray-700 mt-2 whitespace-pre-line">{data.deskripsi}</p>
-      </div>
-
-      <Button onClick={() => alert("Ambil judul belum diimplementasi")} disabled={!isAvailable}>
-        Ambil Judul
-      </Button>
     </div>
   );
 }
