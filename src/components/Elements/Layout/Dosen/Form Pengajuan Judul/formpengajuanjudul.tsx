@@ -518,50 +518,50 @@ export default function FormPengajuanJudulPage() {
 
           <h1 className="text-2xl font-bold text-black">Manajemen Judul</h1>
 
-          <div className="flex gap-6 border-b border-gray-300">
+          <div className="flex justify-between items-end border-b border-gray-300">
+            <div className="flex gap-6">
+              <button
+                onClick={() => setActiveTab("daftar")}
+                className={`pb-2 px-1 font-medium ${
+                  activeTab === "daftar"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                Daftar Judul
+              </button>
+              <button
+                onClick={() => setActiveTab("mahasiswa")}
+                className={`pb-2 px-1 font-medium ${
+                  activeTab === "mahasiswa"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                Daftar Mahasiswa Bimbingan
+              </button>
+              <button
+                onClick={() => setActiveTab("pending")}
+                className={`pb-2 px-1 font-medium ${
+                  activeTab === "pending"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                Pending
+              </button>
+            </div>
             <button
-              onClick={() => setActiveTab("daftar")}
-              className={`pb-2 px-1 font-medium ${
-                activeTab === "daftar"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600"
-              }`}
+              onClick={() => handleOpenModal()}
+              className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition mb-1"
             >
-              Daftar Judul
-            </button>
-            <button
-              onClick={() => setActiveTab("mahasiswa")}
-              className={`pb-2 px-1 font-medium ${
-                activeTab === "mahasiswa"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600"
-              }`}
-            >
-              Daftar Mahasiswa Bimbingan
-            </button>
-            <button
-              onClick={() => setActiveTab("pending")}
-              className={`pb-2 px-1 font-medium ${
-                activeTab === "pending"
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-600"
-              }`}
-            >
-              Pending
+              <i className="bi bi-plus-lg text-lg"></i>
+              Ajukan Judul Baru
             </button>
           </div>
 
           {activeTab === "daftar" && (
             <>
-              <div className="flex justify-end">
-                <button
-                  onClick={() => handleOpenModal()}
-                  className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
-                >
-                  <i className="bi bi-plus-lg text-lg"></i>
-                  Ajukan Judul Baru
-                </button>
-              </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
