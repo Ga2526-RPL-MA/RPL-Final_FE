@@ -66,8 +66,9 @@ export default function DosenDashboardPage() {
 
       <div className="flex flex-1 bg-[#f4f6fb]">
         <SidebarDosen />
-
+        
         <div className="flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+          <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">BERANDA</div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-6">
             <Avatar className="w-20 h-20">
               <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
