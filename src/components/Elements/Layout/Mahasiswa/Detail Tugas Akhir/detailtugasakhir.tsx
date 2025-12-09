@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { fetchJson } from "@/lib/api";
 import { useParams, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Dosen {
@@ -26,6 +27,9 @@ interface JudulDetail {
 }
 
 export default function DetailTugasAkhir() {
+  const router = useRouter();
+  const [profileName, setProfileName] = useState<string>("");
+  const [profileEmail, setProfileEmail] = useState<string>("");
   const searchParams = useSearchParams();
   const routeParams = useParams<{ id?: string }>();
   const id = routeParams?.id || searchParams.get("id") || "";
@@ -90,14 +94,34 @@ export default function DetailTugasAkhir() {
     }
   };
 
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const token = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("access_token="))
+          ?.split("=")[1];
+        if (!token) return;
+        const me = await fetchJson("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfileName(me.profile?.nama || me.user?.email || "");
+        setProfileEmail(me.profile?.email || me.user?.email || "");
+      } catch (err) {
+        console.error("Error fetch profile:", err);
+      }
+    }
+    fetchProfile();
+  }, []);
+
   const statusLabel =
     data?.status === "BELUM_DIAMBIL"
       ? "Tersedia"
       : data?.status === "DIAMBIL"
-      ? "Sudah Diambil"
-      : data?.status === "PUBLISHED"
-      ? "Published"
-      : data?.status;
+        ? "Sudah Diambil"
+        : data?.status === "PUBLISHED"
+          ? "Published"
+          : data?.status;
 
   const isAvailable = data?.status === "BELUM_DIAMBIL";
 
@@ -153,6 +177,7 @@ export default function DetailTugasAkhir() {
             </Link>
           </div>
 
+          {/* Sub Sidebar */}
           <div className="w-full h-[220px] flex flex-col">
             <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
               <i className="bi bi-gear text-xl"></i>
@@ -160,15 +185,30 @@ export default function DetailTugasAkhir() {
             </div>
             <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+                <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="font-medium">John Doe</h1>
-                <h1 className="text-gray-500 text-sm">johndoe@gmail.com</h1>
+                <h1 className="font-medium">{profileName || "Pengguna"}</h1>
+                <h1 className="font-small text-gray-500">{profileEmail || ""}</h1>
               </div>
-              <div className="ml-8">
-                <i className="bi bi-box-arrow-left text-xl"></i>
+              <div className=" ml-8">
+                <button
+                  aria-label="Logout"
+                  onClick={async () => {
+                    try {
+                      await fetchJson("/api/auth/logout", { method: "POST" });
+                    } catch (e) {
+                      console.error("Logout failed", e);
+                    } finally {
+                      document.cookie = "access_token=; path=/; max-age=0";
+                      document.cookie = "role=; path=/; max-age=0";
+                      router.push("/auth/login");
+                    }
+                  }}
+                >
+                  <i className="bi bi-box-arrow-left text-xl"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -199,13 +239,12 @@ export default function DetailTugasAkhir() {
                 <div className="flex justify-between items-start">
                   <h1 className="text-2xl font-semibold text-black">{data.judul}</h1>
                   <span
-                    className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                      data.status === "PUBLISHED"
+                    className={`px-3 py-1 text-xs font-semibold rounded-full ${data.status === "PUBLISHED"
                         ? "bg-blue-100 text-blue-800"
                         : data.status === "DIAMBIL"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
+                          ? "bg-red-100 text-red-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
                   >
                     {statusLabel}
                   </span>
