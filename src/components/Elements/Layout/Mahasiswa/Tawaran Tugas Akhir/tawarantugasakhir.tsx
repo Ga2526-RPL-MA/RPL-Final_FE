@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { fetchJson } from "@/lib/api";
 
 interface Judul {
   id: string;
@@ -25,9 +26,7 @@ export default function TawaranTugasAkhir() {
   useEffect(() => {
     const fetchJudul = async () => {
       try {
-        const res = await fetch("/api/judul");
-        if (!res.ok) throw new Error("Failed to fetch data");
-        const data = await res.json();
+        const data = await fetchJson("/api/judul");
         setJudulList(data.data || data);
       } catch (err) {
         console.error("Error fetch judul:", err);

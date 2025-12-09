@@ -3,13 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { fetchJson } from "@/lib/api";
 
 interface Dosen {
   id: string;
@@ -42,20 +38,6 @@ interface Judul {
   lab?: Lab | null;
 }
 
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: Judul[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
-}
-
 export default function MahasiswaDashboardPage() {
   const router = useRouter();
   const [judulList, setJudulList] = useState<Judul[]>([]);
@@ -72,10 +54,8 @@ export default function MahasiswaDashboardPage() {
   useEffect(() => {
     async function fetchJudul() {
       try {
-        const res = await fetch("/api/judul");
-        const json = await res.json();
+        const json = await fetchJson("/api/judul");
         setJudulList(json.data);
-
       } catch (err) {
         console.error("Error fetch judul:", err);
       } finally {
@@ -224,7 +204,7 @@ export default function MahasiswaDashboardPage() {
                       filteredJudulList.map((item, index) => (
                         <tr
                           key={item.id}
-                          onClick={() => router.push(`/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir?id=${item.id}`)}
+                          onClick={() => router.push(`/mahasiswa/dashboard/tawarantugasakhir/detailtugasakhir/${item.id}`)}
                           className="cursor-pointer hover:bg-gray-100 transition"
                         >
 

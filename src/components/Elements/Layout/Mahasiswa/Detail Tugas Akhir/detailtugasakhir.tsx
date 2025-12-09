@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { fetchJson } from "@/lib/api";
+import { useCallback } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 
 interface Dosen {
   nama: string;
@@ -22,14 +25,16 @@ interface JudulDetail {
   createdAt: string;
 }
 
-export default function DetailTugasAkhir({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function DetailTugasAkhir() {
+  const searchParams = useSearchParams();
+  const routeParams = useParams<{ id?: string }>();
+  const id = routeParams?.id || searchParams.get("id") || "";
 
   const [data, setData] = useState<JudulDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchDetail = async () => {
+  const fetchDetail = useCallback(async () => {
     setLoading(true);
     setErrorMsg(null);
 
@@ -39,34 +44,28 @@ export default function DetailTugasAkhir({ params }: { params: { id: string } })
         .find((row) => row.startsWith("access_token="))
         ?.split("=")[1];
 
+      if (!id) throw new Error("ID judul tidak ditemukan.");
       if (!token) throw new Error("Token tidak ditemukan. Silakan login ulang.");
-      
-      const res = await fetch(`https://final-api.up.railway.app/api/judul/id`, {
+
+      const result = await fetchJson(`/api/judul/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const result = await res.json();
-      
-      const found = result.data.find((item: any) => item.id === id);
-
-      if (!found) throw new Error("Judul tidak ditemukan.");
-
-      setData(found);
-    } catch (err: any) {
-      setErrorMsg(err.message ?? "Terjadi kesalahan");
+      if (!result.data) throw new Error("Judul tidak ditemukan.");
+      setData(result.data);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+      setErrorMsg(message);
       setData(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchDetail();
-  }, [id]);
+  }, [fetchDetail]);
 
   if (loading) return <p className="p-4">Loading...</p>;
   if (errorMsg) return <p className="p-4 text-red-500">Error: {errorMsg}</p>;

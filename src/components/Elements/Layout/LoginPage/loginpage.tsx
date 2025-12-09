@@ -2,6 +2,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { fetchJson } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,27 +15,17 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch(`/api/auth/login`, {
+      const data = await fetchJson("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Login gagal, periksa email dan password");
-      }
-
       document.cookie = `access_token=${data.access_token}; path=/;`;
 
-      const meRes = await fetch(`/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${data.access_token}`,
-        },
+      const meData = await fetchJson("/api/auth/me", {
+        headers: { Authorization: `Bearer ${data.access_token}` },
       });
-
-      const meData = await meRes.json();
 
       document.cookie = `role=${meData.profile?.role}; path=/;`;
 
