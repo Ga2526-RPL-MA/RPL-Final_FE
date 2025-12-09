@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { fetchJson } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 export default function DosenDashboardPage() {
   const [profileName, setProfileName] = useState<string>("");
   const [profileEmail, setProfileEmail] = useState<string>("");
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -102,7 +104,22 @@ export default function DosenDashboardPage() {
                 <h1 className="font-small text-gray-500">{profileEmail || ""}</h1>
               </div>
               <div className=" ml-8">
-                <i className="bi bi-box-arrow-left text-xl"></i>
+                <button
+                  aria-label="Logout"
+                  onClick={async () => {
+                    try {
+                      await fetchJson("/api/auth/logout", { method: "POST" });
+                    } catch (e) {
+                      console.error("Logout failed", e);
+                    } finally {
+                      document.cookie = "access_token=; path=/; max-age=0";
+                      document.cookie = "role=; path=/; max-age=0";
+                      router.push("/auth/login");
+                    }
+                  }}
+                >
+                  <i className="bi bi-box-arrow-left text-xl"></i>
+                </button>
               </div>
             </div>
           </div>

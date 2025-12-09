@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { fetchJson } from "@/lib/api";
+import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
 
 interface Judul {
   id: string;
@@ -64,7 +64,6 @@ export default function TawaranTugasAkhir() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      {/* Header */}
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
         <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
           <div className="flex items-center">
@@ -83,62 +82,8 @@ export default function TawaranTugasAkhir() {
         </div>
       </div>
 
-      {/* Sidebar + Main */}
       <div className="flex flex-1">
-        {/* Sidebar kiri */}
-        <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-          <div className="w-full h-[180px] mt-[30px] flex flex-col">
-            <Link href="/mahasiswa/dashboard">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-house-door text-xl"></i>
-                <h1 className="font-medium">Beranda</h1>
-              </div>
-            </Link>
-
-            <Link href="/mahasiswa/dashboard/tawarantugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition bg-gray-100 rounded-md">
-                <i className="bi bi-people-fill text-xl"></i>
-                <h1 className="font-medium">Tawaran Judul Tugas Akhir</h1>
-              </div>
-            </Link>
-
-            <Link href="/mahasiswa/dashboard/progresstugasakhir">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-book text-xl"></i>
-                <h1 className="font-medium">Progress Tugas Akhir</h1>
-              </div>
-            </Link>
-
-            <Link href="/mahasiswa/dashboard/panduanmahasiswa">
-              <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-                <i className="bi bi-file-earmark text-xl"></i>
-                <h1 className="font-medium">Panduan</h1>
-              </div>
-            </Link>
-          </div>
-
-          <div className="w-full h-[220px] flex flex-col">
-            <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-              <i className="bi bi-gear text-xl"></i>
-              <h1 className="font-medium">Pengaturan</h1>
-            </div>
-            <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="font-medium">John Doe</h1>
-                <h1 className="font-small text-gray-500">johndoe@gmail.com</h1>
-              </div>
-              <div className=" ml-8">
-                <i className="bi bi-box-arrow-left text-xl"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
+        <SidebarMahasiswa />
         <div className="bg-slate-200 flex-1 h-[944px] flex flex-col items-center gap-6 p-6 overflow-y-auto">
           {/* Path */}
           <div className="flex justify-start w-full text-gray-400 gap-2">

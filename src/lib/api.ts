@@ -34,3 +34,15 @@ export async function fetchJson(path: string, init: RequestInit = {}) {
   return res.json()
 }
 
+export async function postJson(path: string, body?: unknown, init: RequestInit = {}) {
+  const headers = new Headers(init.headers || {})
+  if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json")
+  const res = await fetchJson(path, {
+    method: "POST",
+    body: body ? JSON.stringify(body) : undefined,
+    ...init,
+    headers,
+  })
+  return res
+}
+
