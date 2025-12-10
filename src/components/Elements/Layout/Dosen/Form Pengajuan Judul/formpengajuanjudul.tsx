@@ -622,8 +622,8 @@ export default function FormPengajuanJudulPage() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+      <div className="sticky top-0 z-30 w-full h-[80px] flex justify-center items-center border-b border-gray-400 bg-white">
+        <div className="w-full max-w-7xl h-[40px] flex justify-center items-center px-4 md:px-6 relative rounded-md">
           <div className="flex justify-center w-full">
             <img
               src="/LogomyITS Final.png"
@@ -645,11 +645,11 @@ export default function FormPengajuanJudulPage() {
 
           <h1 className="text-2xl font-bold text-black">Manajemen Judul</h1>
 
-          <div className="flex justify-between items-end border-b border-gray-300">
-            <div className="flex gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-300 gap-4 md:gap-0">
+            <div className="flex gap-4 md:gap-6 overflow-x-auto w-full md:w-auto no-scrollbar pb-1 md:pb-0">
               <button
                 onClick={() => setActiveTab("daftar")}
-                className={`pb-2 px-1 font-medium ${activeTab === "daftar"
+                className={`pb-2 px-1 font-medium whitespace-nowrap ${activeTab === "daftar"
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-600"
                   }`}
@@ -658,7 +658,7 @@ export default function FormPengajuanJudulPage() {
               </button>
               <button
                 onClick={() => setActiveTab("mahasiswa")}
-                className={`pb-2 px-1 font-medium ${activeTab === "mahasiswa"
+                className={`pb-2 px-1 font-medium whitespace-nowrap ${activeTab === "mahasiswa"
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-600"
                   }`}
@@ -667,7 +667,7 @@ export default function FormPengajuanJudulPage() {
               </button>
               <button
                 onClick={() => setActiveTab("pending")}
-                className={`pb-2 px-1 font-medium ${activeTab === "pending"
+                className={`pb-2 px-1 font-medium whitespace-nowrap ${activeTab === "pending"
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-600"
                   }`}
@@ -677,10 +677,10 @@ export default function FormPengajuanJudulPage() {
             </div>
             <button
               onClick={() => handleOpenModal()}
-              className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition mb-1"
+              className="w-full md:w-auto bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex justify-center items-center gap-2 hover:bg-blue-700 transition mb-3 md:mb-1"
             >
               <i className="bi bi-plus-lg text-lg"></i>
-              Ajukan Judul Baru
+              <span>Ajukan Judul Baru</span>
             </button>
           </div>
 
@@ -763,7 +763,7 @@ export default function FormPengajuanJudulPage() {
                 </div>
               </div>
 
-              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -822,6 +822,46 @@ export default function FormPengajuanJudulPage() {
                         )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden flex flex-col gap-4">
+                {loading
+                  ? Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                  ))
+                  : paginatedList.length > 0
+                    ? paginatedList.map((item) => (
+                      <div key={item.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 flex flex-col gap-3">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-semibold text-gray-900 line-clamp-2">{item.judul}</h3>
+                          {getStatusBadge(item.status)}
+                        </div>
+                        <p className="text-sm text-gray-600 line-clamp-3">
+                          {item.deskripsi}
+                        </p>
+                        <div className="text-xs text-gray-500 flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <i className="bi bi-building"></i>
+                            <span>{item.lab?.nama || "-"}</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-end pt-2 border-t border-gray-100">
+                          <div className="flex items-center gap-3">
+                            {getActionIcons(item)}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                    : (
+                      <div className="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-200">
+                        Belum ada data
+                      </div>
+                    )}
               </div>
 
               <div className="w-full flex justify-between items-center">
@@ -891,13 +931,16 @@ export default function FormPengajuanJudulPage() {
                           >
                             <option value="">Semua Progress</option>
                             <option value="no-progress">Belum Ada Progress</option>
-                            <option value="Proposal">Proposal</option>
-                            <option value="Bab 1">Bab 1</option>
-                            <option value="Bab 2">Bab 2</option>
-                            <option value="Bab 3">Bab 3</option>
-                            <option value="Bab 4">Bab 4</option>
-                            <option value="Bab 5">Bab 5</option>
-                            <option value="Selesai">Selesai</option>
+                            <option value="PROPOSAL">Proposal</option>
+                            <option value="BAB1">Bab 1</option>
+                            <option value="BAB2">Bab 2</option>
+                            <option value="BAB3">Bab 3</option>
+                            <option value="SEMINAR">Seminar</option>
+                            <option value="BAB4">Bab 4</option>
+                            <option value="BAB5">Bab 5</option>
+                            <option value="SIDANG">Sidang</option>
+                            <option value="EVALUASI">Evaluasi</option>
+                            <option value="SELESAI">Selesai</option>
                           </select>
                         </div>
                         <button
@@ -914,7 +957,7 @@ export default function FormPengajuanJudulPage() {
                 </div>
               </div>
 
-              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -985,6 +1028,62 @@ export default function FormPengajuanJudulPage() {
                 </table>
               </div>
 
+              {/* Mobile Card View */}
+              <div className="md:hidden flex flex-col gap-4">
+                {mahasiswaLoading
+                  ? Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                  ))
+                  : filteredMahasiswaList.length > 0
+                    ? filteredMahasiswaList
+                      .slice(
+                        (mahasiswaPage - 1) * itemsPerPage,
+                        mahasiswaPage * itemsPerPage
+                      )
+                      .map((mahasiswa) => {
+                        const judulAktif = mahasiswa.judul[0] || null;
+                        const progressTerakhir = judulAktif?.progressTerakhir;
+                        return (
+                          <div key={mahasiswa.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 flex flex-col gap-3">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-semibold text-gray-900">{mahasiswa.nama}</h3>
+                                <p className="text-xs text-gray-500">{mahasiswa.email}</p>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div>
+                                <p className="text-xs font-medium text-gray-500">Judul Tugas Akhir</p>
+                                <p className="text-sm text-gray-800 line-clamp-2">{judulAktif ? judulAktif.judul : "-"}</p>
+                              </div>
+
+                              <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
+                                <span className="text-xs font-medium text-gray-500">Progres Terakhir</span>
+                                {progressTerakhir ? (
+                                  <div className="text-right">
+                                    <span className="text-sm font-semibold text-blue-600 block">{progressTerakhir.tahap}</span>
+                                    <span className="text-xs text-gray-400">{new Date(progressTerakhir.createdAt).toLocaleDateString("id-ID")}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-sm text-gray-500">-</span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    : (
+                      <div className="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-200">
+                        Belum ada data mahasiswa bimbingan
+                      </div>
+                    )}
+              </div>
+
               <div className="w-full flex justify-between items-center">
                 <span className="text-sm text-gray-700">
                   Page {mahasiswaPage} of {mahasiswaTotalPages}
@@ -1026,7 +1125,7 @@ export default function FormPengajuanJudulPage() {
                 </div>
               </div>
 
-              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+              <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200 hidden md:block">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -1107,6 +1206,73 @@ export default function FormPengajuanJudulPage() {
                         )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden flex flex-col gap-4">
+                {pendingLoading
+                  ? Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-lg shadow border border-gray-200 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                    </div>
+                  ))
+                  : filteredPendingList.length > 0
+                    ? filteredPendingList
+                      .slice(
+                        (pendingPage - 1) * itemsPerPage,
+                        pendingPage * itemsPerPage
+                      )
+                      .map((request) => (
+                        <div key={request.id} className="bg-white p-4 rounded-lg shadow border border-gray-200 flex flex-col gap-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-semibold text-gray-900">{request.mahasiswa.nama}</h3>
+                              <p className="text-xs text-gray-500">{request.mahasiswa.email}</p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div>
+                              <p className="text-xs font-medium text-gray-500">Judul Yang Diajukan</p>
+                              <p className="text-sm text-gray-800 line-clamp-2">{request.judul.judul}</p>
+                            </div>
+
+                            <div className="flex gap-2 pt-2 border-t border-gray-100 mt-2">
+                              <button
+                                onClick={() =>
+                                  handleApprove(
+                                    request.judulId,
+                                    request.mahasiswaId,
+                                    request.mahasiswa.nama
+                                  )
+                                }
+                                className="flex-1 bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-blue-700 transition"
+                              >
+                                Setujui
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleReject(
+                                    request.judulId,
+                                    request.mahasiswaId,
+                                    request.mahasiswa.nama
+                                  )
+                                }
+                                className="flex-1 bg-red-600 text-white font-semibold py-2 px-4 rounded-lg text-sm hover:bg-red-700 transition"
+                              >
+                                Tolak
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    : (
+                      <div className="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-200">
+                        Belum ada permintaan pending
+                      </div>
+                    )}
               </div>
 
               <div className="w-full flex justify-between items-center">

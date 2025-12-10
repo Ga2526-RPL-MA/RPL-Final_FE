@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { fetchJson, postJson } from "@/lib/api";
 
 const STEPS = [
-  "PROPOSAL", "BAB1", "BAB2", "BAB3",
-  "SEMINAR", "BAB4", "BAB5", "SIDANG", "EVALUASI", "SELESAI"
+  "PROPOSAL", "BAB1", "BAB2", "BAB3", "SEMINAR",
+  "BAB4", "BAB5", "SIDANG", "EVALUASI", "SELESAI"
 ];
 
 export default function ProgressTugasAkhir() {
@@ -276,8 +276,8 @@ export default function ProgressTugasAkhir() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col relative">
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+      <div className="sticky top-0 z-30 w-full h-[80px] flex justify-center items-center border-b border-gray-400 bg-white">
+        <div className="w-full max-w-7xl h-[40px] flex justify-center items-center px-4 md:px-6 relative rounded-md">
           <div className="flex justify-center w-full">
             <img
               src="/LogomyITS Final.png"
@@ -300,7 +300,7 @@ export default function ProgressTugasAkhir() {
           <h1 className="text-2xl font-bold text-black">Progres Tugas Akhir</h1>
 
           <div className="w-full mt-2">
-            <div className="flex justify-between items-center w-full overflow-x-auto">
+            <div className="flex justify-between items-center w-full overflow-x-auto p-4">
               {STEPS.map((item, index) => {
                 const hasProgress = progressList.some((p) => p.tahap === item);
                 const isSelected = selectedStage === item;

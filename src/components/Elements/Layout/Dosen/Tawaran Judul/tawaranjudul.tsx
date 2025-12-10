@@ -123,8 +123,8 @@ export default function TawaranJudulPage() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+      <div className="sticky top-0 z-30 w-full h-[80px] flex justify-center items-center border-b border-gray-400 bg-white">
+        <div className="w-full max-w-7xl h-[40px] flex justify-center items-center px-4 md:px-6 relative rounded-md">
           <div className="flex justify-center w-full">
             <img
               src="/LogomyITS Final.png"
@@ -223,7 +223,66 @@ export default function TawaranJudulPage() {
             </div>
           </div>
 
-          <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4">
+            {loading ? (
+              Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <div className="h-6 bg-gray-200 rounded animate-pulse w-3/4 mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2 mb-4"></div>
+                  <div className="h-px bg-gray-100 my-3"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/3"></div>
+                </div>
+              ))
+            ) : paginatedList.length > 0 ? (
+              paginatedList.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    router.push(
+                      `/dosen/dashboard/tawaranjudul/detail/${item.id}`
+                    )
+                  }
+                  className="bg-white p-4 rounded-lg shadow-sm border border-blue-100 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-3"
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <h3 className="font-bold text-gray-900 line-clamp-2 flex-1">
+                      {item.judul}
+                    </h3>
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(item.status)}
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-500 line-clamp-2">
+                    {item.deskripsi}
+                  </p>
+
+                  <div className="w-full h-[1px] bg-gray-100" />
+
+                  <div className="flex flex-col gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <i className="bi bi-person text-blue-600"></i>
+                      <span>{item.dosen?.nama || "-"}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <i className="bi bi-building text-blue-600"></i>
+                      <span>{item.lab?.nama || "-"}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 text-center">
+                <div className="flex flex-col items-center justify-center text-gray-500">
+                  <i className="bi bi-inbox text-4xl mb-2"></i>
+                  <p>Tidak ada data ditemukan</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="hidden md:block w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

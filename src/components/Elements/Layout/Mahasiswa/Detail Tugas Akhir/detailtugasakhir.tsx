@@ -140,8 +140,8 @@ export default function DetailTugasAkhir() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+      <div className="sticky top-0 z-30 w-full h-[80px] flex justify-center items-center border-b border-gray-400 bg-white">
+        <div className="w-full max-w-7xl h-[40px] flex justify-center items-center px-4 md:px-6 relative rounded-md">
           <div className="flex justify-center w-full">
             <img
               src="/LogomyITS Final.png"
@@ -235,7 +235,7 @@ export default function DetailTugasAkhir() {
 
               <div className="p-4 border border-gray-200 rounded-lg bg-white">
                 <h2 className="text-lg font-semibold text-gray-900 mb-3">Deskripsi</h2>
-                <p className="text-gray-700 whitespace-pre-line leading-relaxed">{data.deskripsi}</p>
+                <p className="text-gray-700 whitespace-pre-line leading-relaxed break-words">{data.deskripsi}</p>
               </div>
 
               {isAvailable && (

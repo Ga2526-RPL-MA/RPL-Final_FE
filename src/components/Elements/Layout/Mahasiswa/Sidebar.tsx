@@ -24,6 +24,15 @@ export default function SidebarMahasiswa() {
   const [isOpen, setIsOpen] = useState(true)
 
   useEffect(() => {
+    // Optional: Auto-close on mobile if needed, or set initial state based on width
+    // For now defaulting to true is fine, but on mobile it starts "open" which covers screen.
+    // Let's check window width on mount.
+    if (window.innerWidth < 768) {
+      setIsOpen(false)
+    }
+  }, [])
+
+  useEffect(() => {
     const fetchProfile = async () => {
       try {
         const me = await fetchJson("/api/auth/me")
@@ -50,13 +59,31 @@ export default function SidebarMahasiswa() {
 
   return (
     <>
+      {/* Mobile Hamburger Trigger */}
+      <button
+        className="md:hidden fixed top-[22px] left-4 z-50 p-2 text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+        onClick={() => setIsOpen(true)}
+      >
+        <i className="bi bi-list text-2xl"></i>
+      </button>
+
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       <div
-        className={`${isOpen ? "w-[300px]" : "w-[80px]"
-          } min-h-screen border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
+        className={`fixed md:relative z-50 top-0 left-0 h-full md:min-h-screen bg-white border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out ${isOpen
+          ? "translate-x-0 w-[300px]"
+          : "-translate-x-full w-[300px] md:translate-x-0 md:w-[80px]"
+          }`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition z-10"
+          className="absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-300 rounded-full hidden md:flex items-center justify-center shadow-md hover:bg-gray-50 transition z-10"
         >
           <i className={`bi ${isOpen ? "bi-chevron-left" : "bi-chevron-right"} text-gray-600 text-sm`}></i>
         </button>
@@ -68,7 +95,7 @@ export default function SidebarMahasiswa() {
               <Link key={item.href} href={item.href} title={!isOpen ? item.label : ""}>
                 <div
                   className={`w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition ${active ? "bg-gray-100 rounded-md" : ""
-                    } ${!isOpen ? "justify-center" : ""}`}
+                    } ${!isOpen ? "md:justify-center" : ""}`}
                 >
                   <i className={`${item.icon} text-xl flex-shrink-0`}></i>
                   {isOpen && <h1 className="font-medium whitespace-nowrap">{item.label}</h1>}
@@ -86,7 +113,7 @@ export default function SidebarMahasiswa() {
         {/* User Section - Moved Up */}
         <div className="w-full flex flex-col mb-4">
           <div
-            className={`w-full flex items-center gap-3 px-4 ${!isOpen ? "justify-center flex-col" : ""
+            className={`w-full flex items-center gap-3 px-4 ${!isOpen ? "md:justify-center flex-col" : ""
               }`}
           >
             <Avatar className={isOpen ? "" : "mx-auto mb-2"}>
@@ -121,7 +148,7 @@ export default function SidebarMahasiswa() {
               <button
                 aria-label="Logout"
                 onClick={onLogout}
-                className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-200 transition-colors hidden md:block"
               >
                 <i className="bi bi-box-arrow-left text-xl text-gray-700"></i>
               </button>

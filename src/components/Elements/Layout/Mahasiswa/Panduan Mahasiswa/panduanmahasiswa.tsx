@@ -4,8 +4,8 @@ export default function Panduan() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       {/* Header */}
-      <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+      <div className="sticky top-0 z-30 w-full h-[80px] flex justify-center items-center border-b border-gray-400 bg-white">
+        <div className="w-full max-w-7xl h-[40px] flex justify-center items-center px-4 md:px-6 relative rounded-md">
           <div className="flex justify-center w-full">
             <img
               src="/LogomyITS Final.png"
