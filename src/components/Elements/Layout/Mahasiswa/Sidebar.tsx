@@ -52,7 +52,7 @@ export default function SidebarMahasiswa() {
     <>
       <div
         className={`${isOpen ? "w-[300px]" : "w-[80px]"
-          } h-[944px] border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
+          } min-h-screen border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -78,13 +78,13 @@ export default function SidebarMahasiswa() {
           })}
         </div>
 
-        {isOpen && (
-          <div className="px-4 mt-6 mb-2">
-            <SidebarCalendar />
-          </div>
-        )}
+        {/* Divider */}
+        <div className="w-full px-4 my-4">
+          <div className="w-full h-[1px] bg-gray-300" />
+        </div>
 
-        <div className="w-full flex flex-col mt-auto mb-6">
+        {/* User Section - Moved Up */}
+        <div className="w-full flex flex-col mb-4">
           <div
             className={`w-full flex items-center gap-3 px-4 ${!isOpen ? "justify-center flex-col" : ""
               }`}
@@ -128,6 +128,13 @@ export default function SidebarMahasiswa() {
             )}
           </div>
         </div>
+
+        {/* Calendar - Moved Down */}
+        {isOpen && (
+          <div className="px-4 mb-6">
+            <SidebarCalendar />
+          </div>
+        )}
       </div>
     </>
   )
