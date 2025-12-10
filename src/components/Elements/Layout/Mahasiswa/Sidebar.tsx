@@ -76,7 +76,7 @@ export default function SidebarMahasiswa() {
       )}
 
       <div
-        className={`fixed md:relative z-50 top-0 left-0 h-full md:min-h-screen bg-white border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out ${isOpen
+        className={`fixed md:relative z-50 md:z-20 top-0 left-0 h-full md:min-h-screen bg-white border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out ${isOpen
           ? "translate-x-0 w-[300px]"
           : "-translate-x-full w-[300px] md:translate-x-0 md:w-[80px]"
           }`}

@@ -95,7 +95,7 @@ export function SidebarCalendar() {
     })
 
     return (
-        <div className="w-full bg-white rounded-xl shadow-lg border border-gray-100 p-4 transition-all duration-300 flex flex-col max-h-[600px]">
+        <div className="w-full bg-white rounded-xl shadow-lg border border-gray-100 p-4 transition-all duration-300 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <button
@@ -173,7 +173,7 @@ export function SidebarCalendar() {
                     Agenda {formattedSelectedDate}
                 </h3>
 
-                <div className="flex-1 overflow-y-auto min-h-[100px] mb-3 space-y-2 pr-1 custom-scrollbar">
+                <div className="min-h-[100px] mb-3 space-y-2 pr-1">
                     {currentAgendas.length > 0 ? (
                         currentAgendas.map((agenda) => (
                             <div key={agenda.id} className="flex items-center justify-between group bg-gray-50 p-2 rounded-lg border border-gray-100 hover:border-blue-100 transition-colors">
