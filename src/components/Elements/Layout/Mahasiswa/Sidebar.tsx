@@ -18,6 +18,7 @@ export default function SidebarMahasiswa() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [isOpen, setIsOpen] = useState(true)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -43,46 +44,74 @@ export default function SidebarMahasiswa() {
   }, [router])
 
   return (
-    <div className="w-[300px] h-[944px] border-r border-gray-400 flex flex-col gap-10">
-      <div className="w-full h-[180px] mt-[30px] flex flex-col">
-        {menu.map((item) => {
-          const active = pathname.startsWith(item.href)
-          return (
-            <Link key={item.href} href={item.href}>
-              <div
-                className={`w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition ${
-                  active ? "bg-gray-100 rounded-md" : ""
-                }`}
+    <>
+      <div
+        className={`${
+          isOpen ? "w-[300px]" : "w-[80px]"
+        } h-[944px] border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
+      >
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-300 rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition z-10"
+        >
+          <i className={`bi ${isOpen ? "bi-chevron-left" : "bi-chevron-right"} text-gray-600 text-sm`}></i>
+        </button>
+
+        <div className="w-full mt-[30px] flex flex-col">
+          {menu.map((item) => {
+            const active = pathname.startsWith(item.href)
+            return (
+              <Link key={item.href} href={item.href} title={!isOpen ? item.label : ""}>
+                <div
+                  className={`w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition ${
+                    active ? "bg-gray-100 rounded-md" : ""
+                  } ${!isOpen ? "justify-center" : ""}`}
+                >
+                  <i className={`${item.icon} text-xl flex-shrink-0`}></i>
+                  {isOpen && <h1 className="font-medium whitespace-nowrap">{item.label}</h1>}
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+        <div className="w-full flex flex-col mt-8">
+          <div
+            className={`w-full flex items-center gap-3 px-4 ${
+              !isOpen ? "justify-center flex-col" : ""
+            }`}
+          >
+            <Avatar className={isOpen ? "" : "mx-auto mb-2"}>
+              <AvatarImage src="https://github.com/shadcn.png" alt={name || "@user"} />
+              <AvatarFallback>{(name || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            {isOpen && (
+              <>
+                <div className="flex-1">
+                  <h1 className="font-medium">{name || "Pengguna"}</h1>
+                  <h1 className="font-small text-gray-500">{email || ""}</h1>
+                </div>
+                <button
+                  aria-label="Logout"
+                  onClick={onLogout}
+                  className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <i className="bi bi-box-arrow-left text-xl text-gray-700"></i>
+                </button>
+              </>
+            )}
+            {!isOpen && (
+              <button
+                aria-label="Logout"
+                onClick={onLogout}
+                className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                <i className={`${item.icon} text-xl`}></i>
-                <h1 className="font-medium">{item.label}</h1>
-              </div>
-            </Link>
-          )
-        })}
-      </div>
-      <div className="w-full h-[220px] flex flex-col">
-        <div className="w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition">
-          <i className="bi bi-gear text-xl"></i>
-          <h1 className="font-medium">Pengaturan</h1>
-        </div>
-        <div className="w-full h-[65px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition mt-5">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt={name || "@user"} />
-            <AvatarFallback>{(name || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="font-medium">{name || "Pengguna"}</h1>
-            <h1 className="font-small text-gray-500">{email || ""}</h1>
-          </div>
-          <div className=" ml-8">
-            <button aria-label="Logout" onClick={onLogout}>
-              <i className="bi bi-box-arrow-left text-xl"></i>
-            </button>
+                <i className="bi bi-box-arrow-left text-xl text-gray-700"></i>
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
