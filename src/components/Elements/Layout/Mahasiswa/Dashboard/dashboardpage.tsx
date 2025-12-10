@@ -121,7 +121,7 @@ export default function MahasiswaDashboardPage() {
   const { selectedDate, agendas, refreshAgendas } = useAgenda();
   const [currentAgendaIndex, setCurrentAgendaIndex] = useState(0);
 
-  // Force refresh agendas on mount to ensure data isolation between users
+
   useEffect(() => {
     refreshAgendas();
   }, []);

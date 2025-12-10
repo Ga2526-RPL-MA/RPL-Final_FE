@@ -2,6 +2,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { fetchJson } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,6 +13,9 @@ export default function RegisterPage() {
   const [role, setRole] = useState("MAHASISWA");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,9 +28,9 @@ export default function RegisterPage() {
     setSuccess("");
 
     try {
-      const res = await fetch(`/api/auth/register`, {
+
+      const res = await fetchJson("/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           password,
@@ -36,16 +40,12 @@ export default function RegisterPage() {
         }),
       });
 
-      const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Registrasi gagal");
-      }
 
       setSuccess("Registrasi berhasil! Silakan login.");
       setTimeout(() => {
         router.push("/auth/login");
-      }, 2000); // Redirect after 2 seconds
+      }, 2000);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -64,11 +64,12 @@ export default function RegisterPage() {
 
       <div className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-8 z-10 overflow-y-auto max-h-[90vh]">
         <div className="flex items-center mb-8">
-          <div
-            className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-            style={{ backgroundImage: "url('/logo.png')" }}
-          ></div>
-          <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
+          <img
+            src="/LogomyITS Final.png"
+            alt="MyITS Final"
+            className="h-[40px] object-contain"
+          />
+
         </div>
 
         <form onSubmit={handleRegister} className="flex flex-col gap-6">
@@ -124,28 +125,46 @@ export default function RegisterPage() {
             <label htmlFor="password" className="text-sm font-medium text-gray-700">
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
               Konfirmasi Password
             </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                <i className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+              </button>
+            </div>
           </div>
 
           {error && (

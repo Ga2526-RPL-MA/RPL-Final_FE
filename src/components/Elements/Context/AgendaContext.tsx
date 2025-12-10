@@ -33,13 +33,17 @@ export function AgendaProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchAgendas = async () => {
+        if (typeof document !== "undefined" && !document.cookie.includes("access_token")) {
+            setLoading(false)
+            return
+        }
+
         setLoading(true)
         try {
             const res = await fetchJson("/api/agendas")
             if (res.success && Array.isArray(res.data)) {
                 const newAgendas: Record<string, Agenda[]> = {}
                 res.data.forEach((item: Agenda) => {
-                    // item.date is ISO string, grab YYYY-MM-DD
                     const dateKey = item.date.split('T')[0]
                     if (!newAgendas[dateKey]) {
                         newAgendas[dateKey] = []
@@ -49,6 +53,10 @@ export function AgendaProvider({ children }: { children: ReactNode }) {
                 setAgendas(newAgendas)
             }
         } catch (error) {
+            if (error instanceof Error && (error.message.includes("401") || error.message.includes("Unauthorized"))) {
+                setAgendas({})
+                return
+            }
             console.error("Failed to fetch agendas:", error)
         } finally {
             setLoading(false)
@@ -56,7 +64,6 @@ export function AgendaProvider({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        // Initial fetch
         fetchAgendas()
     }, [])
 
@@ -71,8 +78,6 @@ export function AgendaProvider({ children }: { children: ReactNode }) {
                 body: JSON.stringify({ date: formattedDate, title })
             })
 
-            // Update local state if successful to avoid re-fetch delay
-            // The API returns the created agenda object
             if (res && res.id) {
                 setAgendas(prev => ({
                     ...prev,

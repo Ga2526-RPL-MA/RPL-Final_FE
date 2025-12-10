@@ -162,17 +162,14 @@ export default function FormPengajuanJudulPage() {
     if (profile && judulList.length > 0) {
       let filtered = judulList.filter((judul) => judul.dosenId === profile.id);
 
-      // Filter by lab
       if (filterLab) {
         filtered = filtered.filter((judul) => judul.labId === filterLab || judul.lab?.id === filterLab);
       }
 
-      // Filter by status
       if (filterStatus) {
         filtered = filtered.filter((judul) => judul.status === filterStatus);
       }
 
-      // Filter by search query
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(
@@ -212,7 +209,6 @@ export default function FormPengajuanJudulPage() {
       if (mahasiswaList.length > 0) {
         let filtered = [...mahasiswaList];
 
-        // Filter by progress
         if (filterProgress) {
           filtered = filtered.filter((mahasiswa) => {
             const judulAktif = mahasiswa.judul[0];
@@ -221,7 +217,6 @@ export default function FormPengajuanJudulPage() {
           });
         }
 
-        // Filter by search query
         if (searchQuery) {
           const query = searchQuery.toLowerCase();
           filtered = filtered.filter(
@@ -281,7 +276,6 @@ export default function FormPengajuanJudulPage() {
       if (pendingList.length > 0) {
         let filtered = [...pendingList];
 
-        // Filter by search query
         if (searchQuery) {
           const query = searchQuery.toLowerCase();
           filtered = filtered.filter(

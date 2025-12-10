@@ -24,9 +24,6 @@ export default function SidebarMahasiswa() {
   const [isOpen, setIsOpen] = useState(true)
 
   useEffect(() => {
-    // Optional: Auto-close on mobile if needed, or set initial state based on width
-    // For now defaulting to true is fine, but on mobile it starts "open" which covers screen.
-    // Let's check window width on mount.
     if (window.innerWidth < 768) {
       setIsOpen(false)
     }
@@ -122,7 +119,7 @@ export default function SidebarMahasiswa() {
             </Avatar>
             {isOpen && (
               <>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   {isLoadingProfile ? (
                     <>
                       <Skeleton className="h-4 w-32 mb-1" />
@@ -130,8 +127,8 @@ export default function SidebarMahasiswa() {
                     </>
                   ) : (
                     <>
-                      <h1 className="font-medium">{name || "Pengguna"}</h1>
-                      <h1 className="font-small text-gray-500">{email || ""}</h1>
+                      <h1 className="font-medium truncate">{name || "Pengguna"}</h1>
+                      <h1 className="text-sm text-gray-500 truncate" title={email}>{email || ""}</h1>
                     </>
                   )}
                 </div>

@@ -120,7 +120,7 @@ export default function SidebarDosen() {
             </Avatar>
             {isOpen && (
               <>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   {isLoadingProfile ? (
                     <>
                       <Skeleton className="h-4 w-32 mb-1" />
@@ -128,8 +128,8 @@ export default function SidebarDosen() {
                     </>
                   ) : (
                     <>
-                      <h1 className="font-medium">{name || "Pengguna"}</h1>
-                      <h1 className="font-small text-gray-500">{email || ""}</h1>
+                      <h1 className="font-medium truncate">{name || "Pengguna"}</h1>
+                      <h1 className="text-sm text-gray-500 truncate" title={email}>{email || ""}</h1>
                     </>
                   )}
                 </div>

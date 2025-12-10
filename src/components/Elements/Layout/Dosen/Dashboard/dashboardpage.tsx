@@ -52,7 +52,6 @@ export default function DosenDashboardPage() {
 
   const { selectedDate, agendas, refreshAgendas } = useAgenda();
 
-  // Force refresh agendas on mount to ensure data isolation between users
   useEffect(() => {
     refreshAgendas();
   }, []);

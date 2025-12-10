@@ -10,6 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -55,11 +57,12 @@ export default function LoginPage() {
 
       <div className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-8 z-10">
         <div className="flex items-center mb-8">
-          <div
-            className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-            style={{ backgroundImage: "url('/logo.png')" }}
-          ></div>
-          <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
+          <img
+            src="/LogomyITS Final.png"
+            alt="MyITS Final"
+            className="h-[40px] object-contain"
+          />
+
         </div>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-6">
@@ -88,14 +91,23 @@ export default function LoginPage() {
                 Lupa Password?
               </Link>
             </div>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+              </button>
+            </div>
           </div>
 
           {error && (

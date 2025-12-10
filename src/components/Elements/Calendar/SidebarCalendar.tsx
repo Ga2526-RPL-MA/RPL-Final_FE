@@ -28,7 +28,6 @@ export function SidebarCalendar() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
-    // Use currentDate for month view navigation
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
 
@@ -72,7 +71,6 @@ export function SidebarCalendar() {
     }
 
     const handleDeleteAgenda = async (id: string) => {
-        // if (!confirm("Hapus agenda ini?")) return
 
         setDeletingId(id)
         try {
@@ -85,7 +83,6 @@ export function SidebarCalendar() {
         }
     }
 
-    // Get agendas for selected date
     const dateKey = selectedDate.toISOString().split('T')[0]
     const currentAgendas = agendas[dateKey] || []
 
@@ -135,13 +132,11 @@ export function SidebarCalendar() {
                 {Array.from({ length: daysInMonth }).map((_, index) => {
                     const day = index + 1
 
-                    // Check if this specific day is selected
                     const isSelected =
                         selectedDate.getDate() === day &&
                         selectedDate.getMonth() === month &&
                         selectedDate.getFullYear() === year
 
-                    // Check if day has agenda (optional: add dot indicator)
                     const checkDate = new Date(year, month, day)
                     const checkKey = checkDate.toISOString().split('T')[0]
                     const hasAgenda = agendas[checkKey]?.length > 0

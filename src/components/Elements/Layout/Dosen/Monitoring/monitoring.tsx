@@ -30,7 +30,7 @@ export default function MonitorPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterProgress, setFilterProgress] = useState(""); // Changed from filterLab
+  const [filterProgress, setFilterProgress] = useState("");
   const [showFilter, setShowFilter] = useState(false);
 
   const itemsPerPage = 10;
@@ -69,14 +69,12 @@ export default function MonitorPage() {
     return tahap;
   };
 
-  // Filter Logic
   const filteredList = mahasiswaList.filter((mhs) => {
     const judulAktif = mhs.judul.find((j) => j.status === "DIAMBIL") || mhs.judul[0];
     const matchSearch =
       mhs.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (judulAktif?.judul || "").toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Updated Logic: Filter by Progress Stage
     const currentProgress = judulAktif?.progressTerakhir?.tahap || "";
 
     let matchProgress = true;
@@ -105,7 +103,7 @@ export default function MonitorPage() {
 
       <div className="flex flex-1">
         <SidebarDosen />
-        <div className="bg-slate-200 flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
+        <div className="bg-slate-200 flex-1 min-h-[calc(100vh-80px)] flex flex-col gap-6 p-6 overflow-y-auto">
           <div className="flex justify-start w-full text-gray-400 gap-2 text-sm">
             <span>BERANDA</span>
             <span>&gt;</span>
