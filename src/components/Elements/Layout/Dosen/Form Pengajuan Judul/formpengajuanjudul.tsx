@@ -161,17 +161,17 @@ export default function FormPengajuanJudulPage() {
   useEffect(() => {
     if (profile && judulList.length > 0) {
       let filtered = judulList.filter((judul) => judul.dosenId === profile.id);
-      
+
       // Filter by lab
       if (filterLab) {
         filtered = filtered.filter((judul) => judul.labId === filterLab || judul.lab?.id === filterLab);
       }
-      
+
       // Filter by status
       if (filterStatus) {
         filtered = filtered.filter((judul) => judul.status === filterStatus);
       }
-      
+
       // Filter by search query
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -182,7 +182,7 @@ export default function FormPengajuanJudulPage() {
             judul.lab?.nama.toLowerCase().includes(query)
         );
       }
-      
+
       setFilteredJudulList(filtered);
     }
   }, [profile, judulList, filterLab, filterStatus, searchQuery]);
@@ -211,7 +211,7 @@ export default function FormPengajuanJudulPage() {
     if (activeTab === "mahasiswa") {
       if (mahasiswaList.length > 0) {
         let filtered = [...mahasiswaList];
-        
+
         // Filter by progress
         if (filterProgress) {
           filtered = filtered.filter((mahasiswa) => {
@@ -220,7 +220,7 @@ export default function FormPengajuanJudulPage() {
             return judulAktif.progressTerakhir.tahap === filterProgress;
           });
         }
-        
+
         // Filter by search query
         if (searchQuery) {
           const query = searchQuery.toLowerCase();
@@ -231,7 +231,7 @@ export default function FormPengajuanJudulPage() {
               mahasiswa.judul.some((j) => j.judul.toLowerCase().includes(query))
           );
         }
-        
+
         setFilteredMahasiswaList(filtered);
         setMahasiswaTotalPages(Math.ceil(filtered.length / itemsPerPage));
       } else {
@@ -280,7 +280,7 @@ export default function FormPengajuanJudulPage() {
       setPendingPage(1);
       if (pendingList.length > 0) {
         let filtered = [...pendingList];
-        
+
         // Filter by search query
         if (searchQuery) {
           const query = searchQuery.toLowerCase();
@@ -291,7 +291,7 @@ export default function FormPengajuanJudulPage() {
               request.judul.judul.toLowerCase().includes(query)
           );
         }
-        
+
         setFilteredPendingList(filtered);
         setPendingTotalPages(Math.ceil(filtered.length / itemsPerPage));
       } else {
@@ -553,8 +553,8 @@ export default function FormPengajuanJudulPage() {
     if (item.status === "DIAMBIL" || item.status === "Diambil") {
       return (
         <>
-          <button 
-            onClick={() => handleDelete(item.id, item.judul)} 
+          <button
+            onClick={() => handleDelete(item.id, item.judul)}
             className="text-red-600 hover:text-red-800"
             title="Hapus judul"
           >
@@ -568,15 +568,15 @@ export default function FormPengajuanJudulPage() {
     } else if (item.status === "DRAFT" || item.status === "Draft") {
       return (
         <>
-          <button 
-            onClick={() => handleConfirm(item.id)} 
+          <button
+            onClick={() => handleConfirm(item.id)}
             className="text-blue-600 hover:text-blue-800"
             title="Unggah (Ubah status menjadi Belum Diambil)"
           >
             <i className="bi bi-upload"></i>
           </button>
-          <button 
-            onClick={() => handleDelete(item.id, item.judul)} 
+          <button
+            onClick={() => handleDelete(item.id, item.judul)}
             className="text-red-600 hover:text-red-800"
             title="Hapus judul"
           >
@@ -590,8 +590,8 @@ export default function FormPengajuanJudulPage() {
     } else if (item.status === "PUBLISHED" || item.status === "Published") {
       return (
         <>
-          <button 
-            onClick={() => handleDelete(item.id, item.judul)} 
+          <button
+            onClick={() => handleDelete(item.id, item.judul)}
             className="text-red-600 hover:text-red-800"
             title="Hapus judul"
           >
@@ -605,8 +605,8 @@ export default function FormPengajuanJudulPage() {
     } else {
       return (
         <>
-          <button 
-            onClick={() => handleDelete(item.id, item.judul)} 
+          <button
+            onClick={() => handleDelete(item.id, item.judul)}
             className="text-red-600 hover:text-red-800"
             title="Hapus judul"
           >
@@ -623,19 +623,13 @@ export default function FormPengajuanJudulPage() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -647,7 +641,7 @@ export default function FormPengajuanJudulPage() {
             <span>BERANDA</span>
             <span>&gt;</span>
             <span>MANAJEMEN JUDUL</span>
-              </div>
+          </div>
 
           <h1 className="text-2xl font-bold text-black">Manajemen Judul</h1>
 
@@ -655,31 +649,28 @@ export default function FormPengajuanJudulPage() {
             <div className="flex gap-6">
               <button
                 onClick={() => setActiveTab("daftar")}
-                className={`pb-2 px-1 font-medium ${
-                  activeTab === "daftar"
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-600"
-                }`}
+                className={`pb-2 px-1 font-medium ${activeTab === "daftar"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+                  }`}
               >
                 Daftar Judul
               </button>
               <button
                 onClick={() => setActiveTab("mahasiswa")}
-                className={`pb-2 px-1 font-medium ${
-                  activeTab === "mahasiswa"
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-600"
-                }`}
+                className={`pb-2 px-1 font-medium ${activeTab === "mahasiswa"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+                  }`}
               >
                 Daftar Mahasiswa Bimbingan
               </button>
               <button
                 onClick={() => setActiveTab("pending")}
-                className={`pb-2 px-1 font-medium ${
-                  activeTab === "pending"
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-600"
-                }`}
+                className={`pb-2 px-1 font-medium ${activeTab === "pending"
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-600"
+                  }`}
               >
                 Pending
               </button>
@@ -691,7 +682,7 @@ export default function FormPengajuanJudulPage() {
               <i className="bi bi-plus-lg text-lg"></i>
               Ajukan Judul Baru
             </button>
-              </div>
+          </div>
 
           {activeTab === "daftar" && (
             <>
@@ -718,7 +709,7 @@ export default function FormPengajuanJudulPage() {
                     )}
                   </button>
                   {showFilter && (
-                    <div 
+                    <div
                       className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 filter-dropdown"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -787,16 +778,16 @@ export default function FormPengajuanJudulPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {loading
                       ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                          <tr key={idx}>
-                            {Array.from({ length: 6 }).map((_, colIdx) => (
-                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                              </td>
-                            ))}
-                          </tr>
-                        ))
+                        <tr key={idx}>
+                          {Array.from({ length: 6 }).map((_, colIdx) => (
+                            <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                            </td>
+                          ))}
+                        </tr>
+                      ))
                       : paginatedList.length > 0
-                      ? paginatedList.map((item, index) => (
+                        ? paginatedList.map((item, index) => (
                           <tr key={item.id}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                               {(currentPage - 1) * itemsPerPage + index + 1}
@@ -822,13 +813,13 @@ export default function FormPengajuanJudulPage() {
                             </td>
                           </tr>
                         ))
-                      : (
-                        <tr>
-                          <td colSpan={6} className="text-center py-4 text-gray-500">
-                            Belum ada data
-                          </td>
-                        </tr>
-                      )}
+                        : (
+                          <tr>
+                            <td colSpan={6} className="text-center py-4 text-gray-500">
+                              Belum ada data
+                            </td>
+                          </tr>
+                        )}
                   </tbody>
                 </table>
               </div>
@@ -841,23 +832,21 @@ export default function FormPengajuanJudulPage() {
                   <button
                     onClick={handlePrev}
                     disabled={currentPage === 1}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Previous
                   </button>
                   <button
                     onClick={handleNext}
                     disabled={currentPage === totalPages}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Next
                   </button>
+                </div>
               </div>
-          </div>
             </>
           )}
 
@@ -873,7 +862,7 @@ export default function FormPengajuanJudulPage() {
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
+                </div>
                 <div className="relative filter-dropdown">
                   <button
                     onClick={() => setShowFilter(!showFilter)}
@@ -886,12 +875,12 @@ export default function FormPengajuanJudulPage() {
                     )}
                   </button>
                   {showFilter && (
-                    <div 
+                    <div
                       className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-10 filter-dropdown"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="space-y-4">
-              <div>
+                        <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Progress
                           </label>
@@ -910,7 +899,7 @@ export default function FormPengajuanJudulPage() {
                             <option value="Bab 5">Bab 5</option>
                             <option value="Selesai">Selesai</option>
                           </select>
-              </div>
+                        </div>
                         <button
                           onClick={() => {
                             setFilterProgress("");
@@ -919,11 +908,11 @@ export default function FormPengajuanJudulPage() {
                         >
                           Reset Filter
                         </button>
-              </div>
-            </div>
+                      </div>
+                    </div>
                   )}
-          </div>
-        </div>
+                </div>
+              </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -939,16 +928,16 @@ export default function FormPengajuanJudulPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {mahasiswaLoading
                       ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                          <tr key={idx}>
-                            {Array.from({ length: 5 }).map((_, colIdx) => (
-                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                              </td>
-                            ))}
-                          </tr>
-                        ))
+                        <tr key={idx}>
+                          {Array.from({ length: 5 }).map((_, colIdx) => (
+                            <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                            </td>
+                          ))}
+                        </tr>
+                      ))
                       : filteredMahasiswaList.length > 0
-                      ? filteredMahasiswaList
+                        ? filteredMahasiswaList
                           .slice(
                             (mahasiswaPage - 1) * itemsPerPage,
                             mahasiswaPage * itemsPerPage
@@ -961,37 +950,37 @@ export default function FormPengajuanJudulPage() {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                   {(mahasiswaPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {mahasiswa.nama}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {mahasiswa.email}
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-500">
-                                {judulAktif ? judulAktif.judul : "-"}
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-500">
-                                {progressTerakhir ? (
-                                  <div>
-                                    <div className="font-medium">{progressTerakhir.tahap}</div>
-                                    <div className="text-xs text-gray-400 mt-1">
-                                      {new Date(progressTerakhir.createdAt).toLocaleDateString("id-ID")}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                  {mahasiswa.nama}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {mahasiswa.email}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-500">
+                                  {judulAktif ? judulAktif.judul : "-"}
+                                </td>
+                                <td className="px-6 py-4 text-sm text-gray-500">
+                                  {progressTerakhir ? (
+                                    <div>
+                                      <div className="font-medium">{progressTerakhir.tahap}</div>
+                                      <div className="text-xs text-gray-400 mt-1">
+                                        {new Date(progressTerakhir.createdAt).toLocaleDateString("id-ID")}
+                                      </div>
                                     </div>
-                                  </div>
-                                ) : (
-                                  "-"
-                                )}
-                              </td>
-                            </tr>
-                          );
-                        })
-                      : (
-                        <tr>
-                          <td colSpan={5} className="text-center py-4 text-gray-500">
-                            Belum ada data mahasiswa bimbingan
-                          </td>
-                        </tr>
-                      )}
+                                  ) : (
+                                    "-"
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        : (
+                          <tr>
+                            <td colSpan={5} className="text-center py-4 text-gray-500">
+                              Belum ada data mahasiswa bimbingan
+                            </td>
+                          </tr>
+                        )}
                   </tbody>
                 </table>
               </div>
@@ -1004,18 +993,16 @@ export default function FormPengajuanJudulPage() {
                   <button
                     onClick={() => setMahasiswaPage((prev) => (prev > 1 ? prev - 1 : prev))}
                     disabled={mahasiswaPage === 1}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      mahasiswaPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${mahasiswaPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setMahasiswaPage((prev) => (prev < mahasiswaTotalPages ? prev + 1 : prev))}
                     disabled={mahasiswaPage === mahasiswaTotalPages}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      mahasiswaPage === mahasiswaTotalPages ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${mahasiswaPage === mahasiswaTotalPages ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Next
                   </button>
@@ -1037,7 +1024,7 @@ export default function FormPengajuanJudulPage() {
                   />
                   <i className="bi bi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
-          </div>
+              </div>
 
               <div className="w-full bg-white rounded-lg shadow-md overflow-hidden border border-blue-200">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -1053,16 +1040,16 @@ export default function FormPengajuanJudulPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {pendingLoading
                       ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                          <tr key={idx}>
-                            {Array.from({ length: 5 }).map((_, colIdx) => (
-                              <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                                <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                              </td>
-                            ))}
-                          </tr>
-                        ))
+                        <tr key={idx}>
+                          {Array.from({ length: 5 }).map((_, colIdx) => (
+                            <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                            </td>
+                          ))}
+                        </tr>
+                      ))
                       : filteredPendingList.length > 0
-                      ? filteredPendingList
+                        ? filteredPendingList
                           .slice(
                             (pendingPage - 1) * itemsPerPage,
                             pendingPage * itemsPerPage
@@ -1111,13 +1098,13 @@ export default function FormPengajuanJudulPage() {
                               </td>
                             </tr>
                           ))
-                      : (
-                        <tr>
-                          <td colSpan={5} className="text-center py-4 text-gray-500">
-                            Belum ada permintaan pending
-                          </td>
-                        </tr>
-                      )}
+                        : (
+                          <tr>
+                            <td colSpan={5} className="text-center py-4 text-gray-500">
+                              Belum ada permintaan pending
+                            </td>
+                          </tr>
+                        )}
                   </tbody>
                 </table>
               </div>
@@ -1130,21 +1117,19 @@ export default function FormPengajuanJudulPage() {
                   <button
                     onClick={() => setPendingPage((prev) => (prev > 1 ? prev - 1 : prev))}
                     disabled={pendingPage === 1}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      pendingPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${pendingPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPendingPage((prev) => (prev < pendingTotalPages ? prev + 1 : prev))}
                     disabled={pendingPage === pendingTotalPages}
-                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                      pendingPage === pendingTotalPages ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${pendingPage === pendingTotalPages ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Next
-            </button>
+                  </button>
                 </div>
               </div>
             </>
@@ -1202,7 +1187,7 @@ export default function FormPengajuanJudulPage() {
                   {labs.map((lab) => (
                     <option key={lab.id} value={lab.id}>
                       {lab.nama}
-                  </option>
+                    </option>
                   ))}
                 </select>
               </div>
@@ -1281,8 +1266,8 @@ export default function FormPengajuanJudulPage() {
               >
                 OK
               </button>
-        </div>
-      </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

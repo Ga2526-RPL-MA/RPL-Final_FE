@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
 import { useEffect, useState } from "react";
 import { fetchJson, postJson } from "@/lib/api";
@@ -49,7 +49,7 @@ export default function ProgressTugasAkhir() {
 
       if (progressJson.success) {
         const progressData = progressJson.data;
-        
+
         const progressWithComments = await Promise.all(
           progressData.map(async (progress: any) => {
             if (progress.id) {
@@ -86,10 +86,10 @@ export default function ProgressTugasAkhir() {
 
       if (judulJson.success && profileId) {
         const judulData = Array.isArray(judulJson.data) ? judulJson.data : [];
-        const judulDiambil = judulData.find((j: any) => 
+        const judulDiambil = judulData.find((j: any) =>
           j.mahasiswa?.id === profileId || j.mahasiswaId === profileId
         );
-        
+
         if (judulDiambil && !judulId) {
           setJudulId(judulDiambil.id);
           setJudulTugasAkhir(judulDiambil.judul || "");
@@ -277,19 +277,13 @@ export default function ProgressTugasAkhir() {
   return (
     <div className="bg-white min-h-screen flex flex-col relative">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -319,22 +313,20 @@ export default function ProgressTugasAkhir() {
                     onClick={() => handleStageClick(item)}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto shadow-sm transition ${
-                        isCompleted
-                          ? "bg-blue-600 text-white shadow-lg"
-                          : isCurrent
+                      className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto shadow-sm transition ${isCompleted
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : isCurrent
                           ? "bg-blue-100 border-2 border-blue-600"
                           : hasProgress
-                          ? "bg-gray-100 border-2 border-gray-400"
-                          : "bg-white border"
-                      } ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}`}
+                            ? "bg-gray-100 border-2 border-gray-400"
+                            : "bg-white border"
+                        } ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}`}
                     >
                       {isCompleted && <i className="bi bi-check text-white"></i>}
                     </div>
                     <span
-                      className={`text-sm mt-2 text-center font-medium ${
-                        isSelected ? "text-blue-600 font-bold" : isCompleted || isCurrent ? "text-blue-600" : hasProgress ? "text-gray-700" : "text-gray-500"
-                      }`}
+                      className={`text-sm mt-2 text-center font-medium ${isSelected ? "text-blue-600 font-bold" : isCompleted || isCurrent ? "text-blue-600" : hasProgress ? "text-gray-700" : "text-gray-500"
+                        }`}
                     >
                       {item}
                     </span>
@@ -344,126 +336,126 @@ export default function ProgressTugasAkhir() {
             </div>
           </div>
 
-              <div className="w-full flex justify-end items-center mt-3">
-                <button
-                  onClick={() => handleOpenModal()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-                >
-                  + Update Progres
-                </button>
+          <div className="w-full flex justify-end items-center mt-3">
+            <button
+              onClick={() => handleOpenModal()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            >
+              + Update Progres
+            </button>
+          </div>
+
+          <div className="w-full">
+            <h2 className="text-2xl font-semibold text-black mb-3">Riwayat Progres</h2>
+
+            {filteredProgressList.length === 0 ? (
+              <div className="w-full bg-white rounded-xl border border-gray-300 shadow-sm p-10 flex flex-col items-center justify-center text-center">
+                <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                  <i className="bi bi-folder-x text-6xl text-gray-400"></i>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700">
+                  {selectedStage ? `Belum Ada Progress untuk ${selectedStage}` : "Belum Ada Progress"}
+                </h3>
               </div>
-
-              <div className="w-full">
-                <h2 className="text-2xl font-semibold text-black mb-3">Riwayat Progres</h2>
-
-                {filteredProgressList.length === 0 ? (
-                  <div className="w-full bg-white rounded-xl border border-gray-300 shadow-sm p-10 flex flex-col items-center justify-center text-center">
-                    <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-                      <i className="bi bi-folder-x text-6xl text-gray-400"></i>
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-700">
-                      {selectedStage ? `Belum Ada Progress untuk ${selectedStage}` : "Belum Ada Progress"}
-                    </h3>
+            ) : (
+              filteredProgressList.map((progress) => (
+                <div key={progress.id} className="bg-white w-full rounded-lg shadow-md border border-gray-300 p-6 mb-5">
+                  <div className="mb-3">
+                    <h3 className="text-lg font-semibold">{progress.tahap}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Di-update pada {new Date(progress.tanggalUpdate).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
                   </div>
-                ) : (
-                  filteredProgressList.map((progress) => (
-                    <div key={progress.id} className="bg-white w-full rounded-lg shadow-md border border-gray-300 p-6 mb-5">
-                      <div className="mb-3">
-                        <h3 className="text-lg font-semibold">{progress.tahap}</h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Di-update pada {new Date(progress.tanggalUpdate).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-y-4 mt-4 text-sm">
-                        <span className="text-gray-500">Deskripsi</span>
-                        <p className="md:col-span-3">{progress.deskripsi}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-y-4 mt-4 text-sm">
+                    <span className="text-gray-500">Deskripsi</span>
+                    <p className="md:col-span-3">{progress.deskripsi}</p>
 
-                        <span className="text-gray-500">Berkas</span>
-                        {progress.fileUploadUrl || progress.fileUpload ? (
-                          <div className="md:col-span-3 flex gap-2">
-                            <a
-                              href={progress.fileUploadUrl || progress.fileUpload || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 underline text-sm"
-                            >
-                              Lihat
-                            </a>
-                            <a
-                              href={progress.fileUploadUrl || progress.fileUpload || "#"}
-                              download
-                              className="text-blue-600 hover:text-blue-800 underline text-sm"
-                            >
-                              Download
-                            </a>
-                          </div>
-                        ) : (
-                          <span className="md:col-span-3 text-gray-500">Tidak ada file</span>
-                        )}
-                      </div>
-
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <h4 className="text-md font-semibold mb-4">Komentar</h4>
-                        
-                        {progress.comments && progress.comments.length > 0 ? (
-                          <div className="mb-4 space-y-4">
-                            {progress.comments.map((comment: any) => {
-                              const hasFile = !!(comment.fileUploadUrl || comment.fileUpload);
-                              return (
-                                <div key={comment.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                  <div className="flex justify-between items-start mb-2">
-                                    <div className="flex-1">
-                                      <p className="text-sm font-medium text-gray-800">{comment.isiKomentar}</p>
-                                      <p className="text-xs text-gray-500 mt-1">
-                                        {new Date(comment.createdAt).toLocaleDateString("id-ID")}
-                                      </p>
-                                      {hasFile && (
-                                        <div className="flex gap-2 mt-2">
-                                          <a
-                                            href={comment.fileUploadUrl || comment.fileUpload || "#"}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:text-blue-800 underline text-sm"
-                                          >
-                                            Lihat
-                                          </a>
-                                          <a
-                                            href={comment.fileUploadUrl || comment.fileUpload || "#"}
-                                            download
-                                            className="text-blue-600 hover:text-blue-800 underline text-sm"
-                                          >
-                                            Download
-                                          </a>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-gray-500">Belum ada komentar</p>
-                        )}
-                      </div>
-
-                      <div className="mt-4 flex justify-end">
-                        <button
-                          onClick={() => handleOpenModal(progress)}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    <span className="text-gray-500">Berkas</span>
+                    {progress.fileUploadUrl || progress.fileUpload ? (
+                      <div className="md:col-span-3 flex gap-2">
+                        <a
+                          href={progress.fileUploadUrl || progress.fileUpload || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 underline text-sm"
                         >
-                          Edit
-                        </button>
+                          Lihat
+                        </a>
+                        <a
+                          href={progress.fileUploadUrl || progress.fileUpload || "#"}
+                          download
+                          className="text-blue-600 hover:text-blue-800 underline text-sm"
+                        >
+                          Download
+                        </a>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
+                    ) : (
+                      <span className="md:col-span-3 text-gray-500">Tidak ada file</span>
+                    )}
+                  </div>
+
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h4 className="text-md font-semibold mb-4">Komentar</h4>
+
+                    {progress.comments && progress.comments.length > 0 ? (
+                      <div className="mb-4 space-y-4">
+                        {progress.comments.map((comment: any) => {
+                          const hasFile = !!(comment.fileUploadUrl || comment.fileUpload);
+                          return (
+                            <div key={comment.id} className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium text-gray-800">{comment.isiKomentar}</p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {new Date(comment.createdAt).toLocaleDateString("id-ID")}
+                                  </p>
+                                  {hasFile && (
+                                    <div className="flex gap-2 mt-2">
+                                      <a
+                                        href={comment.fileUploadUrl || comment.fileUpload || "#"}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                                      >
+                                        Lihat
+                                      </a>
+                                      <a
+                                        href={comment.fileUploadUrl || comment.fileUpload || "#"}
+                                        download
+                                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                                      >
+                                        Download
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">Belum ada komentar</p>
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => handleOpenModal(progress)}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 

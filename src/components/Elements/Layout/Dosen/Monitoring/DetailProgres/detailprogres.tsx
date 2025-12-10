@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchJson, postJson } from "@/lib/api";
 import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { Skeleton } from "@/components/ui/skeleton";
 
 const STEPS = [
   "PROPOSAL", "BAB1", "BAB2", "BAB3",
@@ -85,7 +86,7 @@ export default function DetailProgresPage() {
 
       if (progressJson.success && progressJson.data.length > 0) {
         const progressData = progressJson.data;
-        
+
         const progressWithComments = await Promise.all(
           progressData.map(async (progress: any) => {
             if (progress.id) {
@@ -254,7 +255,7 @@ export default function DetailProgresPage() {
             setSubmitting(false);
             return;
           }
-          
+
           await fetchData();
         } else {
           await fetchData();
@@ -324,7 +325,7 @@ export default function DetailProgresPage() {
               setSubmitting(false);
               return;
             }
-            
+
             await fetchData();
           } catch (uploadError) {
             console.error("Upload error:", uploadError);
@@ -398,28 +399,74 @@ export default function DetailProgresPage() {
 
   if (loading) {
     return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="bg-white min-h-screen flex flex-col relative">
+        <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
+          <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
+            <div className="flex items-center">
+              <Skeleton className="w-[32px] h-[32px] rounded-[8px]" />
+              <Skeleton className="h-4 w-24 ml-3" />
+            </div>
+            <Skeleton className="w-10 h-10 rounded-full" />
+          </div>
+        </div>
+
+        <div className="flex flex-1">
+          <SidebarDosen />
+          <div className="bg-slate-200 flex-1 min-h-screen flex flex-col gap-6 p-6 overflow-y-auto">
+            <div className="flex gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+
+            <Skeleton className="h-8 w-48" />
+
+            <div className="w-full mt-2 flex gap-4 overflow-x-auto pb-2">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="flex flex-col items-center min-w-[70px]">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <Skeleton className="h-3 w-12 mt-2" />
+                </div>
+              ))}
+            </div>
+
+            <div className="w-full">
+              <Skeleton className="h-8 w-40 mb-3" />
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white w-full rounded-lg shadow-md border border-gray-300 p-6 mb-5">
+                  <Skeleton className="h-6 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48 mb-4" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <Skeleton className="h-5 w-24 mb-3" />
+                    <Skeleton className="h-20 w-full rounded-lg" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
+
   return (
     <div className="bg-white min-h-screen flex flex-col relative">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -452,22 +499,20 @@ export default function DetailProgresPage() {
                     onClick={() => handleStageClick(item)}
                   >
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto shadow-sm transition ${
-                        isCompleted
-                          ? "bg-blue-600 text-white shadow-lg"
-                          : isCurrent
+                      className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto shadow-sm transition ${isCompleted
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : isCurrent
                           ? "bg-blue-100 border-2 border-blue-600"
                           : hasProgress
-                          ? "bg-gray-100 border-2 border-gray-400"
-                          : "bg-white border"
-                      } ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}`}
+                            ? "bg-gray-100 border-2 border-gray-400"
+                            : "bg-white border"
+                        } ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""}`}
                     >
                       {isCompleted && <i className="bi bi-check text-white"></i>}
                     </div>
                     <span
-                      className={`text-sm mt-2 text-center font-medium ${
-                        isSelected ? "text-blue-600 font-bold" : isCompleted || isCurrent ? "text-blue-600" : hasProgress ? "text-gray-700" : "text-gray-500"
-                      }`}
+                      className={`text-sm mt-2 text-center font-medium ${isSelected ? "text-blue-600 font-bold" : isCompleted || isCurrent ? "text-blue-600" : hasProgress ? "text-gray-700" : "text-gray-500"
+                        }`}
                     >
                       {item}
                     </span>
@@ -533,7 +578,7 @@ export default function DetailProgresPage() {
 
                   <div className="mt-6 pt-6 border-t border-gray-200">
                     <h4 className="text-md font-semibold mb-4">Komentar</h4>
-                    
+
                     {progress.comments && progress.comments.length > 0 && (
                       <div className="mb-4 space-y-4">
                         {progress.comments.map((comment: any) => {
@@ -566,22 +611,22 @@ export default function DetailProgresPage() {
                                     </div>
                                   )}
                                 </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleEditComment(comment, progress)}
-                                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteComment(comment)}
-                                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                                >
-                                  Hapus
-                                </button>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => handleEditComment(comment, progress)}
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteComment(comment)}
+                                    className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                  >
+                                    Hapus
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
                           );
                         })}
                       </div>
@@ -595,7 +640,7 @@ export default function DetailProgresPage() {
                         value={commentTexts[progress.id] || ""}
                         onChange={(e) => setCommentTexts({ ...commentTexts, [progress.id]: e.target.value })}
                       />
-                      
+
                       <div className="flex items-center gap-2 mb-4">
                         <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-200 transition">
                           <i className="bi bi-folder2-open"></i>
@@ -612,7 +657,7 @@ export default function DetailProgresPage() {
                         </span>
                       </div>
                       <p className="text-xs text-gray-500 mb-4">TXT, PDF, DOC, DOCX, JPG, PNG, GIF (Max. 100mb)</p>
-                      
+
                       <div className="flex gap-2">
                         {editingComment && selectedProgress?.id === progress.id && (
                           <button

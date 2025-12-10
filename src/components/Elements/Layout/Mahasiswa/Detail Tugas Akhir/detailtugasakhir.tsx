@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { fetchJson } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useParams, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
@@ -141,19 +141,13 @@ export default function DetailTugasAkhir() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -172,8 +166,33 @@ export default function DetailTugasAkhir() {
           <h1 className="text-2xl font-bold text-black">Detail Tugas Akhir</h1>
 
           {loading ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <p className="text-gray-500">Memuat data...</p>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+              <div className="flex items-start justify-between">
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-6 w-24 rounded-full" />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i}>
+                    <Skeleton className="h-4 w-24 mb-2" />
+                    <Skeleton className="h-5 w-40" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 border border-gray-200 rounded-lg bg-white">
+                <Skeleton className="h-6 w-32 mb-4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Skeleton className="h-10 w-32 rounded-lg" />
+              </div>
             </div>
           ) : errorMsg ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

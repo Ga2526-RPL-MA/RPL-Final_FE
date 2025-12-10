@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { fetchJson } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
 import { useAgenda } from "@/components/Elements/Context/AgendaContext";
 
@@ -52,6 +53,7 @@ interface JudulDiambil {
 export default function MahasiswaDashboardPage() {
   const [profileName, setProfileName] = useState<string>("");
   const [profileEmail, setProfileEmail] = useState<string>("");
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [judulDiambil, setJudulDiambil] = useState<JudulDiambil | null>(null);
   const [loadingJudul, setLoadingJudul] = useState(true);
 
@@ -70,6 +72,8 @@ export default function MahasiswaDashboardPage() {
         setProfileEmail(me.profile?.email || me.user?.email || "");
       } catch (err) {
         console.error("Error fetch profile:", err);
+      } finally {
+        setIsLoadingProfile(false);
       }
     }
     fetchProfile();
@@ -143,19 +147,13 @@ export default function MahasiswaDashboardPage() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-300 bg-[#f4f6fb]">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
-              <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -166,15 +164,24 @@ export default function MahasiswaDashboardPage() {
         <div className="flex-1 h-[944px] flex flex-col gap-6 p-6 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex items-center gap-6">
             <Avatar className="w-20 h-20">
-              <AvatarImage src="https://github.com/shadcn.png" alt={profileName || "@user"} />
+              <AvatarImage src="/profile.png" alt={profileName || "@user"} />
               <AvatarFallback>{(profileName || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
               <p className="text-sm text-gray-600">Mahasiswa</p>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                {profileName ? `Selamat datang, ${profileName}` : "Selamat datang"}
-              </h1>
-              <p className="text-sm text-gray-500">{profileEmail}</p>
+              {isLoadingProfile ? (
+                <>
+                  <Skeleton className="h-8 w-64 mb-1" />
+                  <Skeleton className="h-4 w-48" />
+                </>
+              ) : (
+                <>
+                  <h1 className="text-2xl font-semibold text-gray-900">
+                    {profileName ? `Selamat datang, ${profileName}` : "Selamat datang"}
+                  </h1>
+                  <p className="text-sm text-gray-500">{profileEmail}</p>
+                </>
+              )}
             </div>
           </div>
 
@@ -251,7 +258,17 @@ export default function MahasiswaDashboardPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <h3 className="text-sm font-semibold text-gray-900 mb-3">Judul Tugas Akhir Saya</h3>
             {loadingJudul ? (
-              <div className="text-center py-4 text-gray-500 text-sm">Memuat data...</div>
+              <div className="bg-white border border-gray-100 rounded-lg p-4">
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <div className="flex gap-4 mt-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              </div>
             ) : judulDiambil ? (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">

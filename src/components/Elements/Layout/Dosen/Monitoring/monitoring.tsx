@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -66,19 +62,13 @@ export default function MonitorPage() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -108,16 +98,16 @@ export default function MonitorPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading
                   ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                      <tr key={idx}>
-                        {Array.from({ length: 5 }).map((_, colIdx) => (
-                          <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                          </td>
-                        ))}
-                      </tr>
-                    ))
+                    <tr key={idx}>
+                      {Array.from({ length: 5 }).map((_, colIdx) => (
+                        <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))
                   : mahasiswaList.length > 0
-                  ? mahasiswaList.map((mahasiswa, index) => {
+                    ? mahasiswaList.map((mahasiswa, index) => {
                       const judulAktif = mahasiswa.judul.find((j) => j.status === "DIAMBIL") || mahasiswa.judul[0];
                       return (
                         <tr key={mahasiswa.id}>
@@ -144,13 +134,13 @@ export default function MonitorPage() {
                         </tr>
                       );
                     })
-                  : (
-                    <tr>
-                      <td colSpan={5} className="text-center py-4 text-gray-500">
-                        Belum ada data
-                      </td>
-                    </tr>
-                  )}
+                    : (
+                      <tr>
+                        <td colSpan={5} className="text-center py-4 text-gray-500">
+                          Belum ada data
+                        </td>
+                      </tr>
+                    )}
               </tbody>
             </table>
           </div>
@@ -163,18 +153,16 @@ export default function MonitorPage() {
               <button
                 onClick={handlePrev}
                 disabled={currentPage === 1}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 Next
               </button>

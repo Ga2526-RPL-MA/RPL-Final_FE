@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { fetchJson } from "@/lib/api";
 import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
@@ -125,19 +124,13 @@ export default function TawaranTugasAkhir() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-400">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -245,16 +238,16 @@ export default function TawaranTugasAkhir() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading
                   ? Array.from({ length: itemsPerPage }).map((_, idx) => (
-                      <tr key={idx}>
-                        {Array.from({ length: 6 }).map((_, colIdx) => (
-                          <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
-                            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
-                          </td>
-                        ))}
-                      </tr>
-                    ))
+                    <tr key={idx}>
+                      {Array.from({ length: 6 }).map((_, colIdx) => (
+                        <td key={colIdx} className="px-6 py-4 whitespace-nowrap">
+                          <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))
                   : paginatedList.length > 0
-                  ? paginatedList.map((item, index) => (
+                    ? paginatedList.map((item, index) => (
                       <tr
                         key={item.id}
                         onClick={() =>
@@ -286,15 +279,15 @@ export default function TawaranTugasAkhir() {
                         </td>
                       </tr>
                     ))
-                  : (
-                    <tr>
-                      <td colSpan={6} className="text-center py-4 text-gray-500">
-                        {searchTerm.trim() || filterLab || filterStatus
-                          ? "Tidak ada hasil yang ditemukan"
-                          : "Belum ada data"}
-                      </td>
-                    </tr>
-                  )}
+                    : (
+                      <tr>
+                        <td colSpan={6} className="text-center py-4 text-gray-500">
+                          {searchTerm.trim() || filterLab || filterStatus
+                            ? "Tidak ada hasil yang ditemukan"
+                            : "Belum ada data"}
+                        </td>
+                      </tr>
+                    )}
               </tbody>
             </table>
           </div>
@@ -307,18 +300,16 @@ export default function TawaranTugasAkhir() {
               <button
                 onClick={handlePrev}
                 disabled={currentPage === 1}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${
-                  currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded-lg text-sm hover:bg-gray-50 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 Next
               </button>

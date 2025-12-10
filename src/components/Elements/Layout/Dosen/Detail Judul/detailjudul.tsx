@@ -62,29 +62,23 @@ export default function DetailJudulDosen() {
     data.status === "BELUM_DIAMBIL"
       ? "Tersedia"
       : data.status === "DIAMBIL"
-      ? "Sudah Diambil"
-      : data.status === "PUBLISHED"
-      ? "Dipublish"
-      : data.status;
+        ? "Sudah Diambil"
+        : data.status === "PUBLISHED"
+          ? "Dipublish"
+          : data.status;
 
   const isAvailable = data.status === "BELUM_DIAMBIL";
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <div className="w-full h-[80px] flex justify-center items-center border-b border-gray-300 bg-[#f4f6fb]">
-        <div className="w-[1450px] h-[40px] flex justify-between items-center px-6 relative rounded-md">
-          <div className="flex items-center">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
-          </div>
-          <div className="flex items-center">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+        <div className="w-[1450px] h-[40px] flex justify-center items-center px-6 relative rounded-md">
+          <div className="flex justify-center w-full">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[50px] object-contain"
+            />
           </div>
         </div>
       </div>
@@ -106,7 +100,7 @@ export default function DetailJudulDosen() {
             <div className="p-4 border rounded-lg shadow-sm bg-white space-y-4">
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src="https://ui-avatars.com/api/?name=DSN" />
+                  <AvatarImage src="/profile.png" />
                 </Avatar>
                 <div>
                   <p className="text-sm text-gray-500">Dosen</p>

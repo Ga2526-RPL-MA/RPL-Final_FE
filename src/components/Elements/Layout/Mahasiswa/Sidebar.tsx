@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { fetchJson } from "@/lib/api"
+import { Skeleton } from "@/components/ui/skeleton"
 import { SidebarCalendar } from "../../Calendar/SidebarCalendar"
 
 const menu = [
@@ -19,6 +20,7 @@ export default function SidebarMahasiswa() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   const [isOpen, setIsOpen] = useState(true)
 
   useEffect(() => {
@@ -30,6 +32,8 @@ export default function SidebarMahasiswa() {
       } catch {
         setName("")
         setEmail("")
+      } finally {
+        setIsLoadingProfile(false)
       }
     }
     fetchProfile()
@@ -86,14 +90,23 @@ export default function SidebarMahasiswa() {
               }`}
           >
             <Avatar className={isOpen ? "" : "mx-auto mb-2"}>
-              <AvatarImage src="https://github.com/shadcn.png" alt={name || "@user"} />
+              <AvatarImage src="/profile.png" alt={name || "@user"} />
               <AvatarFallback>{(name || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             {isOpen && (
               <>
                 <div className="flex-1">
-                  <h1 className="font-medium">{name || "Pengguna"}</h1>
-                  <h1 className="font-small text-gray-500">{email || ""}</h1>
+                  {isLoadingProfile ? (
+                    <>
+                      <Skeleton className="h-4 w-32 mb-1" />
+                      <Skeleton className="h-3 w-24" />
+                    </>
+                  ) : (
+                    <>
+                      <h1 className="font-medium">{name || "Pengguna"}</h1>
+                      <h1 className="font-small text-gray-500">{email || ""}</h1>
+                    </>
+                  )}
                 </div>
                 <button
                   aria-label="Logout"
