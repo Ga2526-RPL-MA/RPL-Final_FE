@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { fetchJson } from "@/lib/api"
+import { SidebarCalendar } from "../../Calendar/SidebarCalendar"
 
 const menu = [
   { href: "/dosen/dashboard", icon: "bi bi-house-door", label: "Beranda" },
@@ -38,7 +39,7 @@ export default function SidebarDosen() {
   const onLogout = useCallback(async () => {
     try {
       await fetchJson("/api/auth/logout", { method: "POST" })
-    } catch {}
+    } catch { }
     document.cookie = "access_token=; path=/; max-age=0"
     document.cookie = "role=; path=/; max-age=0"
     router.push("/auth/login")
@@ -47,9 +48,8 @@ export default function SidebarDosen() {
   return (
     <>
       <div
-        className={`${
-          isOpen ? "w-[300px]" : "w-[80px]"
-        } h-[944px] border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
+        className={`${isOpen ? "w-[300px]" : "w-[80px]"
+          } h-[944px] border-r border-gray-400 flex flex-col transition-all duration-300 ease-in-out relative bg-white`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -64,9 +64,8 @@ export default function SidebarDosen() {
             return (
               <Link key={item.href} href={item.href} title={!isOpen ? item.label : ""}>
                 <div
-                  className={`w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition ${
-                    active ? "bg-gray-100 rounded-md" : ""
-                  } ${!isOpen ? "justify-center" : ""}`}
+                  className={`w-full h-[45px] flex items-center gap-3 px-4 cursor-pointer hover:bg-gray-200 transition ${active ? "bg-gray-100 rounded-md" : ""
+                    } ${!isOpen ? "justify-center" : ""}`}
                 >
                   <i className={`${item.icon} text-xl flex-shrink-0`}></i>
                   {isOpen && <h1 className="font-medium whitespace-nowrap">{item.label}</h1>}
@@ -75,11 +74,17 @@ export default function SidebarDosen() {
             )
           })}
         </div>
-        <div className="w-full flex flex-col mt-8">
+
+        {isOpen && (
+          <div className="px-4 mt-6 mb-2">
+            <SidebarCalendar />
+          </div>
+        )}
+
+        <div className="w-full flex flex-col mt-auto mb-6">
           <div
-            className={`w-full flex items-center gap-3 px-4 ${
-              !isOpen ? "justify-center flex-col" : ""
-            }`}
+            className={`w-full flex items-center gap-3 px-4 ${!isOpen ? "justify-center flex-col" : ""
+              }`}
           >
             <Avatar className={isOpen ? "" : "mx-auto mb-2"}>
               <AvatarImage src="https://github.com/shadcn.png" alt={name || "@user"} />

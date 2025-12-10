@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { fetchJson } from "@/lib/api";
 import SidebarMahasiswa from "@/components/Elements/Layout/Mahasiswa/Sidebar";
+import { useAgenda } from "@/components/Elements/Context/AgendaContext";
 
 interface Dosen {
   id: string;
@@ -81,15 +82,15 @@ export default function MahasiswaDashboardPage() {
           fetchJson("/api/judul"),
           fetchJson("/api/auth/me"),
         ]);
-        
+
         const profileId = meData.profile?.id || meData.user?.id || "";
         const judulListData = Array.isArray(judulData.data) ? judulData.data : Array.isArray(judulData) ? judulData : [];
-        
+
         const judulYangDiambil = judulListData.find(
-          (j: JudulDiambil) => 
+          (j: JudulDiambil) =>
             j.mahasiswaId === profileId || j.mahasiswa?.id === profileId
         );
-        
+
         setJudulDiambil(judulYangDiambil || null);
       } catch (err) {
         console.error("Error fetch judul:", err);
@@ -113,7 +114,31 @@ export default function MahasiswaDashboardPage() {
     };
   };
 
-  const currentDate = getCurrentDate();
+  const { selectedDate, agendas, refreshAgendas } = useAgenda();
+  const [currentAgendaIndex, setCurrentAgendaIndex] = useState(0);
+
+  // Force refresh agendas on mount to ensure data isolation between users
+  useEffect(() => {
+    refreshAgendas();
+  }, []);
+
+  const formattedDate = selectedDate.toISOString().split('T')[0];
+  const dayName = selectedDate.toLocaleDateString('id-ID', { weekday: 'long' });
+  const fullDate = selectedDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const agendaList = agendas[formattedDate] || [];
+
+  useEffect(() => {
+    setCurrentAgendaIndex(0);
+  }, [selectedDate]);
+
+  const nextAgenda = () => {
+    setCurrentAgendaIndex((prev) => (prev + 1) % agendaList.length);
+  };
+
+  const prevAgenda = () => {
+    setCurrentAgendaIndex((prev) => (prev - 1 + agendaList.length) % agendaList.length);
+  };
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -154,7 +179,7 @@ export default function MahasiswaDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link 
+            <Link
               href="/mahasiswa/dashboard/tawarantugasakhir"
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
             >
@@ -167,7 +192,7 @@ export default function MahasiswaDashboardPage() {
               </div>
             </Link>
 
-            <Link 
+            <Link
               href="/mahasiswa/dashboard/progresstugasakhir"
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
             >
@@ -182,12 +207,43 @@ export default function MahasiswaDashboardPage() {
 
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm text-white p-4 flex items-center justify-between">
               <div className="flex flex-col">
-                <h2 className="text-2xl font-bold">{currentDate.day}</h2>
-                <p className="text-sm">{currentDate.date} {currentDate.month} {currentDate.year}</p>
+                <h2 className="text-2xl font-bold">{dayName}</h2>
+                <p className="text-sm">{fullDate}</p>
               </div>
               <div className="flex flex-col items-end">
                 <p className="text-sm">Agenda Hari Ini:</p>
-                <p className="text-sm font-semibold">Seminar Proposal</p>
+                {agendaList.length > 0 ? (
+                  <div className="flex flex-col items-end w-48">
+                    <div className="flex items-center gap-2 mb-1">
+                      {agendaList.length > 1 && (
+                        <button
+                          onClick={prevAgenda}
+                          className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          <i className="bi bi-chevron-left text-xs"></i>
+                        </button>
+                      )}
+                      <p className="text-sm font-semibold truncate max-w-[120px] text-right">
+                        {agendaList[currentAgendaIndex]?.title}
+                      </p>
+                      {agendaList.length > 1 && (
+                        <button
+                          onClick={nextAgenda}
+                          className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          <i className="bi bi-chevron-right text-xs"></i>
+                        </button>
+                      )}
+                    </div>
+                    {agendaList.length > 1 && (
+                      <span className="text-[10px] opacity-70">
+                        {currentAgendaIndex + 1} / {agendaList.length}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm font-semibold italic opacity-80">Tidak ada agenda</p>
+                )}
               </div>
             </div>
           </div>
@@ -202,8 +258,8 @@ export default function MahasiswaDashboardPage() {
                   <div className="flex-1">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">{judulDiambil.judul}</h4>
                     <p className="text-xs text-gray-600 mb-3">
-                      {judulDiambil.deskripsi?.length > 150 
-                        ? judulDiambil.deskripsi.slice(0, 150) + "..." 
+                      {judulDiambil.deskripsi?.length > 150
+                        ? judulDiambil.deskripsi.slice(0, 150) + "..."
                         : judulDiambil.deskripsi || "-"}
                     </p>
                     <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
@@ -217,13 +273,12 @@ export default function MahasiswaDashboardPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        judulDiambil.status === "DIAMBIL" 
-                          ? "bg-orange-100 text-orange-800"
-                          : judulDiambil.status === "SELESAI"
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${judulDiambil.status === "DIAMBIL"
+                        ? "bg-orange-100 text-orange-800"
+                        : judulDiambil.status === "SELESAI"
                           ? "bg-green-100 text-green-800"
                           : "bg-blue-100 text-blue-800"
-                      }`}>
+                        }`}>
                         {judulDiambil.status === "DIAMBIL" ? "Diambil" : judulDiambil.status === "SELESAI" ? "Selesai" : judulDiambil.status}
                       </span>
                     </div>

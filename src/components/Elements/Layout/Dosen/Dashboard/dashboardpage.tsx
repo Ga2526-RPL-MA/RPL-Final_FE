@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetchJson } from "@/lib/api";
 import SidebarDosen from "@/components/Elements/Layout/Dosen/Sidebar";
 import Link from "next/link";
+import { useAgenda } from "@/components/Elements/Context/AgendaContext";
 
 export default function DosenDashboardPage() {
   const [profileName, setProfileName] = useState<string>("");
@@ -42,7 +43,34 @@ export default function DosenDashboardPage() {
       }
     }
     fetchPendingCount();
+    fetchPendingCount();
   }, []);
+
+  const { selectedDate, agendas, refreshAgendas } = useAgenda();
+
+  // Force refresh agendas on mount to ensure data isolation between users
+  useEffect(() => {
+    refreshAgendas();
+  }, []);
+  const [currentAgendaIndex, setCurrentAgendaIndex] = useState(0);
+
+  const formattedDate = selectedDate.toISOString().split('T')[0];
+  const dayName = selectedDate.toLocaleDateString('id-ID', { weekday: 'long' });
+  const fullDate = selectedDate.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const agendaList = agendas[formattedDate] || [];
+
+  useEffect(() => {
+    setCurrentAgendaIndex(0);
+  }, [selectedDate]);
+
+  const nextAgenda = () => {
+    setCurrentAgendaIndex((prev) => (prev + 1) % agendaList.length);
+  };
+
+  const prevAgenda = () => {
+    setCurrentAgendaIndex((prev) => (prev - 1 + agendaList.length) % agendaList.length);
+  };
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -83,7 +111,7 @@ export default function DosenDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link 
+            <Link
               href="/dosen/dashboard/manajemen-judul"
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer"
             >
@@ -96,7 +124,7 @@ export default function DosenDashboardPage() {
               </div>
             </Link>
 
-            <Link 
+            <Link
               href="/dosen/dashboard/manajemen-judul?tab=pending"
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex gap-3 hover:shadow-md transition-shadow cursor-pointer relative"
             >
@@ -116,12 +144,43 @@ export default function DosenDashboardPage() {
 
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-sm text-white p-4 flex items-center justify-between">
               <div className="flex flex-col">
-                <h2 className="text-2xl font-bold">Selasa</h2>
-                <p className="text-sm">02 Desember 2025</p>
+                <h2 className="text-2xl font-bold">{dayName}</h2>
+                <p className="text-sm">{fullDate}</p>
               </div>
               <div className="flex flex-col items-end">
                 <p className="text-sm">Agenda Hari Ini:</p>
-                <p className="text-sm font-semibold">Seminar Proposal</p>
+                {agendaList.length > 0 ? (
+                  <div className="flex flex-col items-end w-48">
+                    <div className="flex items-center gap-2 mb-1">
+                      {agendaList.length > 1 && (
+                        <button
+                          onClick={prevAgenda}
+                          className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          <i className="bi bi-chevron-left text-xs"></i>
+                        </button>
+                      )}
+                      <p className="text-sm font-semibold truncate max-w-[120px] text-right">
+                        {agendaList[currentAgendaIndex]?.title}
+                      </p>
+                      {agendaList.length > 1 && (
+                        <button
+                          onClick={nextAgenda}
+                          className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        >
+                          <i className="bi bi-chevron-right text-xs"></i>
+                        </button>
+                      )}
+                    </div>
+                    {agendaList.length > 1 && (
+                      <span className="text-[10px] opacity-70">
+                        {currentAgendaIndex + 1} / {agendaList.length}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm font-semibold italic opacity-80">Tidak ada agenda</p>
+                )}
               </div>
             </div>
           </div>

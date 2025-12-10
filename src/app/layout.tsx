@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
+import { AgendaProvider } from "@/components/Elements/Context/AgendaContext";
 
 export const metadata: Metadata = {
   title: "RPL_Final Project",
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        {children}
+        <AgendaProvider>{children}</AgendaProvider>
       </body>
     </html>
   );
