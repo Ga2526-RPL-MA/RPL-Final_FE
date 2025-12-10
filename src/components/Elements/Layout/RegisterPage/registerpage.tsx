@@ -62,102 +62,116 @@ export default function RegisterPage() {
     >
       <div className="absolute inset-0 bg-black/80"></div>
 
-      <div className="relative bg-white w-[700px] h-[750px] rounded-[45px] p-[27px] z-10">
-        <div className="flex items-center gap-3">
+      <div className="relative bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-8 z-10 overflow-y-auto max-h-[90vh]">
+        <div className="flex items-center mb-8">
           <div
             className="w-[32px] h-[32px] rounded-[8px] bg-center bg-no-repeat bg-contain"
             style={{ backgroundImage: "url('/logo.png')" }}
           ></div>
-          <h1 className="text-black text-lg font-bold">RPL FINAL</h1>
+          <h1 className="text-black text-sm ml-3 font-bold">RPL FINAL</h1>
         </div>
 
-        <form
-          onSubmit={handleRegister}
-          className="w-[378px] mx-auto mt-[20px] flex flex-col"
-        >
-          <h1 className="text-4xl font-bold">Register</h1>
+        <form onSubmit={handleRegister} className="flex flex-col gap-6">
+          <h1 className="text-2xl font-bold text-gray-900">Register</h1>
 
-          <label htmlFor="role" className="mt-[20px]">
-            Peran
-          </label>
-          <select
-            id="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value.toUpperCase())}
-            className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300"
-          >
-            <option value="MAHASISWA">Mahasiswa</option>
-            <option value="DOSEN">Dosen</option>
-          </select>
-
-          <label htmlFor="name" className="mt-[10px]">
-            Nama
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={nama}
-            onChange={(e) => setNama(e.target.value)}
-            className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300 px-3"
-            required
-          />
-
-          <label htmlFor="email" className="mt-[20px]">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300 px-3"
-            required
-          />
-          <p className="text-sm text-gray-700 mt-[10px]">
-            Gunakan email civitas akademika ITS
-          </p>
-
-          <label htmlFor="password" className="mt-[20px]">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300 px-3"
-            required
-          />
-
-          <label htmlFor="confirmPassword" className="mt-[20px]">
-            Konfirmasi Password
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-[378px] h-[44px] rounded-[8px] mt-[5px] border border-gray-300 px-3"
-            required
-          />
-
-          {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
-          {success && <p className="text-green-500 text-sm mt-3">{success}</p>}
-
-          <div className="flex justify-end mt-[20px]">
-            <button
-              type="submit"
-              className="bg-blue-400 font-bold text-white rounded-md w-[77px] h-[40px]"
+          <div className="flex flex-col gap-2">
+            <label htmlFor="role" className="text-sm font-medium text-gray-700">
+              Peran
+            </label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value.toUpperCase())}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Daftar
-            </button>
+              <option value="MAHASISWA">Mahasiswa</option>
+              <option value="DOSEN">Dosen</option>
+            </select>
           </div>
 
-          <div className="flex justify-center items-center gap-2 mt-[20px]">
-            <p className="text-sm text-gray-700">Sudah memiliki akun?</p>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="name" className="text-sm font-medium text-gray-700">
+              Nama
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={nama}
+              onChange={(e) => setNama(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <p className="text-xs text-gray-500">
+              Gunakan email civitas akademika ITS
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+              Konfirmasi Password
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <p className="text-green-600 text-sm">{success}</p>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+          >
+            Daftar
+          </button>
+
+          <div className="flex justify-center items-center gap-2 text-sm">
+            <p className="text-gray-600">Sudah memiliki akun?</p>
             <Link
               href="/auth/login"
-              className="text-sm text-blue-500 font-semibold hover:underline"
+              className="text-blue-600 hover:text-blue-800 font-semibold"
             >
               Masuk sekarang
             </Link>
