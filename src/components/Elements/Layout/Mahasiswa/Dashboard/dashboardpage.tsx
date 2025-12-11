@@ -48,6 +48,7 @@ interface JudulDiambil {
   lab?: { nama: string } | null;
   mahasiswaId?: string;
   mahasiswa?: { id: string };
+  progressTerakhir?: { tahap: string } | null;
 }
 
 export default function MahasiswaDashboardPage() {
@@ -325,14 +326,66 @@ export default function MahasiswaDashboardPage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Pengumuman</h3>
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 rounded-md px-3 py-2">
-                  <i className="bi bi-bell"></i>
-                  <span>We've just released a new feature</span>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Status Tugas Akhir</h3>
+            <div className="space-y-3">
+              {judulDiambil ? (
+                <>
+                  <div className="flex items-start gap-3 text-sm bg-green-50 p-3 rounded-lg border border-green-100">
+                    <div className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <i className="bi bi-check-lg text-xs"></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Judul Disetujui</p>
+                      <p className="text-gray-600 text-xs">
+                        Pembimbing: {judulDiambil.dosen?.nama}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 text-sm bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <div className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <i className="bi bi-bar-chart-fill text-xs"></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">Progress Saat Ini</p>
+                      <p className="text-gray-600 text-xs font-medium text-blue-700">
+                        {judulDiambil.progressTerakhir?.tahap || "Belum ada progress"}
+                      </p>
+                      <Link href="/mahasiswa/dashboard/progresstugasakhir" className="text-[10px] text-blue-500 hover:underline mt-1 block">
+                        Update Progress &rarr;
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-start gap-3 text-sm bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                  <div className="bg-yellow-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i className="bi bi-exclamation-lg text-xs"></i>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Belum Ada Judul</p>
+                    <p className="text-gray-600 text-xs">
+                      Anda belum memiliki judul TA yang disetujui.
+                    </p>
+                    <Link href="/mahasiswa/dashboard/tawarantugasakhir" className="text-[10px] text-yellow-600 hover:underline mt-1 block">
+                      Cari Judul Sekarang &rarr;
+                    </Link>
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* Hardcoded System Info to keep dashboard lively */}
+              <div className="flex items-start gap-3 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2">
+                <div className="bg-gray-400 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <i className="bi bi-info-lg text-xs"></i>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Info Akademik</p>
+                  <p className="text-gray-600 text-xs">
+                    Batas akhir pendaftaran sidang periode ini: 25 Desember 2025.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

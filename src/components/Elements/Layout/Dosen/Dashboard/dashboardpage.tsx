@@ -11,7 +11,6 @@ export default function DosenDashboardPage() {
   const [profileName, setProfileName] = useState<string>("");
   const [profileEmail, setProfileEmail] = useState<string>("");
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [pendingCount, setPendingCount] = useState<number>(0);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -35,19 +34,29 @@ export default function DosenDashboardPage() {
     fetchProfile();
   }, []);
 
+  const [pendingCount, setPendingCount] = useState<number>(0);
+  const [pendingRequests, setPendingRequests] = useState<any[]>([]); // Using any for efficiency, ideally interface
+  const [activeStudents, setActiveStudents] = useState<any[]>([]);
+
   useEffect(() => {
-    async function fetchPendingCount() {
+    async function fetchDashboardData() {
       try {
-        const data = await fetchJson("/api/judul/requests?status=PENDING");
-        const requests = data.data || [];
+        // Fetch Pending Requests
+        const reqData = await fetchJson("/api/judul/requests?status=PENDING");
+        const requests = reqData.data || [];
+        setPendingRequests(requests);
         setPendingCount(requests.length);
+
+        // Fetch Active Students (Bimbingan)
+        const mhsData = await fetchJson("/api/dosen/mahasiswa?limit=5"); // Limit 5 for recent
+        // Assuming API returns { data: [...] }
+        setActiveStudents(mhsData.data || []);
+
       } catch (err) {
-        console.error("Error fetch pending count:", err);
-        setPendingCount(0);
+        console.error("Error fetch dashboard data:", err);
       }
     }
-    fetchPendingCount();
-    fetchPendingCount();
+    fetchDashboardData();
   }, []);
 
   const { selectedDate, agendas, refreshAgendas } = useAgenda();
@@ -192,14 +201,48 @@ export default function DosenDashboardPage() {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Pengumuman</h3>
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 rounded-md px-3 py-2">
-                  <i className="bi bi-bell"></i>
-                  <span>We’ve just released a new feature</span>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">Aktivitas Terkini</h3>
+            <div className="space-y-3">
+              {pendingRequests.length > 0 ? (
+                pendingRequests.slice(0, 3).map((req, i) => (
+                  <Link
+                    key={`req-${i}`}
+                    href={`/dosen/dashboard/manajemen-judul?tab=pending`}
+                    className="flex items-start gap-3 text-sm bg-orange-50 p-3 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
+                  >
+                    <div className="bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <i className="bi bi-person-plus-fill text-xs"></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{req.mahasiswa?.nama || "Mahasiswa"}</p>
+                      <p className="text-gray-600 text-xs">Mengajukan judul: <span className="italic">"{req.judul?.judul || "Judul"}"</span></p>
+                    </div>
+                  </Link>
+                ))
+              ) : null}
+
+              {activeStudents.length > 0 ? (
+                activeStudents.slice(0, 3).map((mhs, i) => (
+                  <div key={`mhs-${i}`} className="flex items-start gap-3 text-sm bg-blue-50 p-3 rounded-lg border border-blue-100">
+                    <div className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <i className="bi bi-journal-text text-xs"></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{mhs.nama}</p>
+                      <p className="text-gray-600 text-xs">
+                        Progress saat ini: <span className="font-medium text-blue-700">{mhs.judul?.[0]?.progressTerakhir?.tahap || "Belum ada progress"}</span>
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : null}
+
+              {pendingRequests.length === 0 && activeStudents.length === 0 && (
+                <div className="text-center py-6 text-gray-500">
+                  <i className="bi bi-inbox text-3xl mb-2 block opacity-50"></i>
+                  <p className="text-xs">Belum ada aktivitas baru</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
