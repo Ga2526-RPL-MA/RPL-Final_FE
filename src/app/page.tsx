@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -16,29 +15,47 @@ export default function Home() {
 
   return (
     <div
-      className="relative h-screen w-screen bg-cover bg-center"
+      className="relative h-screen w-screen bg-cover bg-center flex justify-center items-center"
       style={{ backgroundImage: "url('/home-bg.jpg')" }}
     >
-      <div className="absolute inset-0 bg-black/80"></div>
+      <div className="absolute inset-0 bg-black/60"></div>
 
-      <div className="relative z-10 flex items-start justify-start h-full pt-[100px] pl-[107px]">
-        <div className="bg-[#181D27] w-[600px] h-[369px] rounded-[45px]">
+      {/* Glassmorphism Card */}
+      <div className="relative w-full max-w-lg p-10 z-10 rounded-3xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
+        {/* Gradient accent at bottom */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-gradient-to-t from-purple-600/30 via-purple-500/10 to-transparent blur-2xl pointer-events-none"></div>
 
-          <div className="flex items-center mt-[36px] ml-[34px]">
-            <div
-              className="w-[32px] h-[32px] rounded-[8px] bg-white bg-center bg-no-repeat bg-contain"
-              style={{ backgroundImage: "url('/logo.png')" }}
-            ></div>
-            <h1 className="text-white text-lg ml-3 font-bold">RPL FINAL</h1>
+        <div className="relative z-10">
+          {/* Logo */}
+          <div className="flex items-center mb-6">
+            <img
+              src="/LogomyITS Final.png"
+              alt="MyITS Final"
+              className="h-[36px] object-contain brightness-0 invert"
+            />
           </div>
 
-          <div className="relative item-center justify-center mt-[40px] ml-[70px] w-[456px] h-[183px]">
-            <h1 className="text-white w-[414] h-[120] font-bold text-4xl">Selamat Datang Di IFinal</h1>
+          {/* Title */}
+          <div className="flex flex-col gap-3 mb-8">
+            <h1 className="text-4xl font-bold text-white leading-tight">
+              Selamat datang di<br />myITS Final
+            </h1>
+            <p className="text-base text-gray-300">
+              Eksplorasi Tugas Akhir di sini.
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3">
             <Link href="/auth/login">
-              <button className="bg-[#2E90FA] text-white font-bold rounded-[5px] w-[92] h-[46]">Masuk</button>
+              <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-all hover:shadow-lg hover:shadow-blue-500/30">
+                Masuk
+              </button>
             </Link>
             <Link href="/auth/register">
-              <button className="border-1 rounded-[5px] font-bold text-white w-[173] h-[46] ml-5">Daftar Akun Baru</button>
+              <button className="border border-white/30 hover:bg-white/10 text-white font-semibold py-2 px-6 rounded-lg transition-all">
+                Daftar Akun Baru
+              </button>
             </Link>
           </div>
         </div>
